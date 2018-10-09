@@ -1,0 +1,80 @@
+import json
+import re
+import pandas as pd
+
+class Parser:
+
+    # holds the dictionary of provenance
+    _provData = {}
+    
+    #Holds a dictionary of data frames where each data frame is an 
+    # "element" of the provenance. e.g procedure nodes, data nodes, etc.
+    _provElements = {}
+
+    # Constructor takes a filepath to a provenance file and reads in 
+    # the information into memory
+    def __init__(self, filepath):
+        provJson = open(filepath)
+        provLines = []
+        for line in provJson:
+            if("//" not in line):
+                provLines.append(line)
+    
+        prov = ''.join(provLines)
+    
+        prov = prov.replace("rdt:", "")
+        prov = prov.replace("prov:", "")
+    
+        prov = json.loads(prov)
+
+        for provKey in prov:
+            for provElement in prov[provKey]:
+                self._provData[provElement] = prov[provKey][provElement]
+
+        provChars = {"procNodes":"p", "dataNodes":"d", "funcNodes":"f",
+                    "procProcEdges":"pp", "procDataEdges":"pd", "dataProvEdges":"dp",
+                    "funcProcEdges":"fp", "funcLibEdges":"m", "agents":"a"}
+
+        for key in provChars:
+            self._provElements[key] = self._parseGeneral(provChars[key])
+
+        # Add the environment prov data
+        d = dict((k, self._provData[k]) for k in ["environment"])
+        self._provElements["environment"] = pd.DataFrame(data = d)
+
+        # Add the libraries used 
+        d = self._parseGeneral("l")
+        self._provElements["libraries"] = d[["name", "version"]]
+
+        # Add the scripts sourced 
+        d = dict((k, self._provData["environment"][k]) for k in ["sourcedScripts", "sourcedScriptTimeStamps"])
+        self._provElements["scripts"] = pd.DataFrame(data = d, index = range(0, len(d) - 1))
+
+
+    def _provKeys(self):
+        return(self._provData.keys())
+
+    def _parseGeneral(self, requested):
+
+        # regex matches when a string starts with the letter(s) requested and is followed
+        # by a variable amount of digits, and the string ends after the digits
+        regex = "^" + requested + "\\d+$"
+        
+        matches = [string for string in self._provKeys() if re.match(regex,string)]
+        
+        d = dict((k, self._provData[k]) for k in matches)
+
+        return(pd.DataFrame(data = d).T)
+
+    def getProvInfo(self, requestedProv):
+        return(self._provElements[requestedProv])
+
+
+if __name__ == '__main__':
+    prov = Parser('/Users/Wonsil/Desktop/test.json')
+    
+    print(prov.getProvInfo("environment"))
+
+    
+
+
