@@ -14,6 +14,9 @@ class Parser:
     # Constructor takes a filepath to a provenance file and reads in 
     # the information into memory
     def __init__(self, filepath):
+
+        # before the json can be converted into a Pythonic structure
+        # it has to be 'cleaned.' prefixes and comments are removed
         provJson = open(filepath)
         provLines = []
         for line in provJson:
@@ -27,10 +30,13 @@ class Parser:
     
         prov = json.loads(prov)
 
+        # Unlist the nested dictionary by one level. This 
+        # way we have a 'master list' of provenance nodes and edges
         for provKey in prov:
             for provElement in prov[provKey]:
                 self._provData[provElement] = prov[provKey][provElement]
 
+        # Here start building up the parsed dic that will be queried by getter functions
         provChars = {"procNodes":"p", "dataNodes":"d", "funcNodes":"f",
                     "procProcEdges":"pp", "procDataEdges":"pd", "dataProvEdges":"dp",
                     "funcProcEdges":"fp", "funcLibEdges":"m", "agents":"a"}
@@ -50,18 +56,18 @@ class Parser:
         d = dict((k, self._provData["environment"][k]) for k in ["sourcedScripts", "sourcedScriptTimeStamps"])
         self._provElements["scripts"] = pd.DataFrame(data = d, index = range(0, len(d) - 1))
 
-
-    def _provKeys(self):
-        return(self._provData.keys())
-
+    # To process nodes/edges from the master list the same process can be used
+    # for most of them. This function handles converting dicts to the necessary data frame.
     def _parseGeneral(self, requested):
 
         # regex matches when a string starts with the letter(s) requested and is followed
         # by a variable amount of digits, and the string ends after the digits
         regex = "^" + requested + "\\d+$"
         
-        matches = [string for string in self._provKeys() if re.match(regex,string)]
+        # finding all of the matching keys using regex
+        matches = [string for string in self._provData.keys() if re.match(regex,string)]
         
+        # make a dict that can be converted into a data frame from those keys
         d = dict((k, self._provData[k]) for k in matches)
 
         return(pd.DataFrame(data = d).T)
