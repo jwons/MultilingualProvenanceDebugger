@@ -14,21 +14,24 @@ class Parser:
     # Constructor takes a filepath to a provenance file and reads in 
     # the information into memory
     def __init__(self, filepath):
-
+        prov = ""
+        
         # before the json can be converted into a Pythonic structure
         # it has to be 'cleaned.' prefixes and comments are removed
-        provJson = open(filepath)
-        provLines = []
-        for line in provJson:
-            if("//" not in line):
-                provLines.append(line)
-    
-        prov = ''.join(provLines)
-    
-        prov = prov.replace("rdt:", "")
-        prov = prov.replace("prov:", "")
-    
-        prov = json.loads(prov)
+        with open(filepath) as provJson:
+            provLines = []
+            for line in provJson:
+                if("//" not in line):
+                    provLines.append(line)
+
+            prov = ''.join(provLines)
+
+            prov = prov.replace("rdt:", "")
+            prov = prov.replace("prov:", "")
+
+            prov = json.loads(prov)
+
+        
 
         # Unlist the nested dictionary by one level. This 
         # way we have a 'master list' of provenance nodes and edges
@@ -38,7 +41,7 @@ class Parser:
 
         # Here start building up the parsed dic that will be queried by getter functions
         provChars = {"procNodes":"p", "dataNodes":"d", "funcNodes":"f",
-                    "procProcEdges":"pp", "procDataEdges":"pd", "dataProvEdges":"dp",
+                    "procProcEdges":"pp", "procDataEdges":"pd", "dataProcEdges":"dp",
                     "funcProcEdges":"fp", "funcLibEdges":"m", "agents":"a"}
 
         for key in provChars:
@@ -72,5 +75,36 @@ class Parser:
 
         return(pd.DataFrame(data = d).T)
 
+    # Access function to get any part of the parsed provenance
     def getProvInfo(self, requestedProv):
         return(self._provElements[requestedProv])
+
+    def getEnvironment(self):
+        return(self.getProvInfo("environment"))
+
+    def getLibs(self):
+        return(self.getProvInfo("libraries"))
+
+    def getScripts(self):
+        return(self.getProvInfo("scripts"))
+
+    def getProcNodes(self):
+        return(self.getProvInfo("procNodes"))
+
+    def getDataNodes(self):
+        return(self.getProvInfo("dataNodes"))
+
+    def getFuncNodes(self):
+        return(self.getProvInfo("funcNodes"))
+
+    def getProcProc(self):
+        return(self.getProvInfo("procProcEdges"))
+
+    def getDataProc(self):
+        return(self.getProvInfo("procDataEdges"))
+
+    def getProcData(self):
+        return(self.getProvInfo("procDataEdges"))
+
+    def getFuncProc(self):
+        return(self.getProvInfo("funcProcEdges"))
