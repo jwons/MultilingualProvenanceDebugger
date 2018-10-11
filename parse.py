@@ -74,13 +74,3 @@ class Parser:
 
     def getProvInfo(self, requestedProv):
         return(self._provElements[requestedProv])
-
-
-if __name__ == '__main__':
-    prov = Parser('/Users/Wonsil/Desktop/test.json')
-    
-    print(prov.getProvInfo("environment"))
-
-    
-
-
