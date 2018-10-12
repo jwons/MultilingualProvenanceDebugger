@@ -1,13 +1,9 @@
-from parse import Parser
+from Parse import Parser
+from Graph import Grapher
 
 if __name__ == '__main__':
     prov = Parser('tests/test.json')
+    graph = Grapher(prov)
 
-    provChars = ["procNodes", "dataNodes", "funcNodes",
-                "procProcEdges", "procDataEdges", "dataProcEdges",
-                "funcProcEdges", "funcLibEdges", "agents"]
-
-    for provElement in provChars:
-        print(prov.getProvInfo(provElement))
-
+    
     

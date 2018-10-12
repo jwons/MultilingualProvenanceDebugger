@@ -101,7 +101,7 @@ class Parser:
         return(self.getProvInfo("procProcEdges"))
 
     def getDataProc(self):
-        return(self.getProvInfo("procDataEdges"))
+        return(self.getProvInfo("dataProcEdges"))
 
     def getProcData(self):
         return(self.getProvInfo("procDataEdges"))
