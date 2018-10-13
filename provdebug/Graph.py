@@ -1,7 +1,7 @@
 import networkx as nx
 import pandas as pd
 import numpy as np
-from Parse import Parser
+from .Parse import Parser
 
 class Grapher:
 
