@@ -73,7 +73,13 @@ class Parser:
         # make a dict that can be converted into a data frame from those keys
         d = dict((k, self._provData[k]) for k in matches)
 
-        return(pd.DataFrame(data = d).T)
+        retVal = pd.DataFrame(data = d).T
+
+        labels = list(retVal.index)
+
+        retVal["label"] = pd.Series(labels, index = retVal.index)
+
+        return(retVal)
 
     # Access function to get any part of the parsed provenance
     def getProvInfo(self, requestedProv):

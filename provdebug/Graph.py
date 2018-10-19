@@ -9,7 +9,7 @@ class Grapher:
         
         # The nodes of the graph will be the nodes from the provenance
         # This grapher needs to track all the edges between data and procedures
-        self._nodes = list(prov.getProcNodes().index) + list(prov.getDataNodes().index)
+        self._nodes = list(prov.getProcNodes()["label"]) + list(prov.getDataNodes()["label"])
 
         # In the provenance the edges of the graph are stored.
         # They are labeled with the types of nodes they are, 
@@ -37,7 +37,7 @@ class Grapher:
     # This function is used to generate a list of the nodes that a singular
     # node is connected to. The user can choose to search for connections forward
     # or backward.
-    def getLineage(self, nodeID, backward = True):
+    def getLineage(self, nodeID, forward = False):
 
         # The traversal algorithm is dependent on the index value of
         # the chosen node. 
@@ -46,7 +46,7 @@ class Grapher:
         # Finding the connections forward vs backward in the script is 
         # as simple as reversing the edges in the graph. The graph is 
         # stored with the edges pointing for backward connections.
-        if(backward):
+        if(not forward):
             nodeIndices = list(nx.dfs_preorder_nodes(self._graph, nodeIndex))
         else:
             nodeIndices = list(nx.dfs_preorder_nodes(self._graph.reverse(), nodeIndex))
