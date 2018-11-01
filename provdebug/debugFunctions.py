@@ -138,13 +138,23 @@ class ProvDebug:
     
     def _grabLine(self, lineNumber, state):
 
-        lineFrame = pd.DataFrame()
+        retVal = []
+        nodes = []
 
+        # When state is false, the user is looking for information regarding the values of the variables
+        # on a single line of code. 
         if(state == False):
+            
+            # Find the procedure node labels from the line the user requested
             nodes = self._procNodes[self._procNodes["startLine"] == lineNumber]["label"].values
-
+            
+            # This structure will hold all of the nodes that have been referenced on a
+            # line, *including the line itself*
             referencedNodes = np.array([])
 
+            # Create a list of nodes those that are referenced on the line
+            # by finding their corresponding data node (via data-to-proc edges)
+            # and seeing if there's another proc node attached (via proc-to-data edges)
             for node in nodes:
                 referencedEntity = self._dataProcEdges[self._dataProcEdges["activity"] == node]["entity"].values
 
@@ -157,49 +167,123 @@ class ProvDebug:
                 
                 referencedNodes = np.append(referencedNodes, referencedNode)
             
+            # Combone the found nodes with the line's node
             referencedNodes = np.append(referencedNodes, nodes)
-            referencedNodes = [x for x in referencedNodes if str(x) != 'nan']
+            # remove any blank nodes that may have been added in the search for 
+            # referenced nodes 
+            nodes = [x for x in referencedNodes if str(x) != 'nan']
+            
+        
+        # If state == True that means they are looking for the state of execution up to this point 
+        else:
+            node = self._procNodes[self._procNodes["startLine"] == lineNumber]["label"].values[0]
 
-            retVal = []
+            entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"]
+            if(len(entity) is not 0):
+                entity = entity.values[0]
 
-            for node in referencedNodes:
-                retVal.append(self._processNode(node))
-            #pd.DataFrame(columns = ["index", "name", "value", "container", "dimensions", "type"])
-            retVal = pd.DataFrame(retVal)
+            while (len(entity) is 0):
+                # Grab the procedure nodes and procedure data edges so
+                # we can 'walk backward' through execution and grab the nodes
+                # previous to our current ones
+                allProcNodes = self._procNodes[self._procNodes["type"] == "Operation"]
+                allProcData = self.prov.getProcData()
 
-            return(retVal)
+                # Currently the indices are set to the labels, reindex them to 
+                # ints so we can index through 
+                allProcNodes.index = range(len(allProcNodes.index))
+                newNodeIndex = allProcNodes[allProcNodes["label"] == node].index
+                if(len(newNodeIndex) == 0):
+                    break
+                else:
+                    newNodeIndex = newNodeIndex.values[0] - 1
+                node = allProcNodes.iloc[[newNodeIndex]]["label"].values[0]
+
+                entity = allProcData[allProcData["activity"] == node]["entity"]
+                if(len(entity) is not 0):
+                    entity = entity.values[0]
+                if(newNodeIndex == 0 and len(entity) == 0):
+                    break
+            
+            if(len(entity) is not 0):
+                
+                # Find preceding data nodes and subset them out
+                dataNodes = self._dataNodes
+                dataNodes.index = range(len(dataNodes.index))
+
+                rowNum = dataNodes[dataNodes["label"] == entity].index.values[0]
+
+                nodes = dataNodes.iloc[:rowNum + 1]["label"].values
+
+                # Account for duplicates by removing all but the tail
+                nodeNames = dataNodes[dataNodes["label"].isin(nodes)]["name"].values
+                tempDf = pd.DataFrame({"nodes":nodes, "names":nodeNames})
+                nodes = tempDf.drop_duplicates(subset=["names"], keep="last")["nodes"].values
+
+        for node in nodes:
+            if(node[0] == "p"):
+                node = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values
+                if(len(node) is not 0):
+                    node = node[0]
+            retVal.append(self._processNode(node))
+        retVal = pd.DataFrame(retVal)
+        retVal = retVal.dropna()
+        cols = ["name", "value", "type", "container", "dimensions"]
+        return(retVal[cols])
 
     # This helper function is used to find information about the node
     # passed to it. A row with the information is created and appended
     # to a data frame
-    def _processNode(self, node):
-        if(node[0] == "p"): #Called by reference
-            entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values[0]
+    def _processNode(self, entity):
 
+        '''
+        # When procedure nodes are passed to this helper, from line has been
+        # called by reference. 
+        if(node[0] == "p"): 
+            
+            # Find the entity the matches the procedure node that has been 
+            # passed to the helper function
+            entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values
+            if(len(entity) != 0):
+                entity = entity[0]
+        else:
+            entity = node
+        '''
+
+        # This dict will hold a single row of the later 
+        # to be data frame, the dicts will be collected into a list
+        # and converted into a data frame
         dfRow = {}
 
+        # In case there is no data, initialize the row to NA
         dfRow["name"] = "NA" 
         dfRow["value"] = "NA" 
         dfRow["container"] = "NA" 
         dfRow["dimensions"] = "NA" 
         dfRow["type"] = "NA" 
 
+        # If there is no entity then just assign the line to the name 
+        # If there is an entity, grab it's info and populate the row
         if(len(entity) != 0):
             varInfo = self._dataNodes[self._dataNodes["label"] == entity]
-
             dfRow["name"] = varInfo["name"].values[0]
             dfRow["value"] = varInfo["value"].values[0]
-            if(varInfo["valType"][0] == "function"):
+
+            # R Functions do not have containers nor dimensions 
+            if(varInfo["valType"].values[0] == "function"):
                 dfRow["container"] = "NA"
                 dfRow["dimensions"] = "NA"
                 dfRow["type"] = "function"
+
+            # If it's not an R function the type, container, and dimensions are
+            # stored in a string as JSON
             else:
-                valType = json.loads(varInfo["valType"][0])
+                valType = json.loads(varInfo["valType"].values[0])
 
                 dfRow["container"] = valType["container"]
                 dfRow["dimensions"] = valType["dimension"][0]
                 dfRow["type"] = valType["type"][0]
         else:
-            dfRow["name"] = self._procNodes[self._procNodes["label"] == node]["name"]
+            dfRow["name"] = np.nan
 
         return(dfRow)
