@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='provdebug',
-      version='0.1',
+      version='0.3',
       description='Multilingual Provenance Debugger',
       url='http://github.com/jwons/MultilingualProvenanceDebugger', #currently private
       author='Joseph Wonsil',
@@ -11,6 +11,6 @@ setup(name='provdebug',
       install_requires=[
           'pandas',
           'networkx',
-          'numpy',
+          'numpy'      
       ],
       zip_safe=False)

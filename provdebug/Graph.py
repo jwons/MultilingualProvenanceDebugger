@@ -24,7 +24,7 @@ class Grapher:
         edges = pd.concat([procData, dataProc], sort = True)
         
         # This creates an all zero dataframe of the corrrect proportions that
-        # will have the connections assinged as "1" next 
+        # will have the connections assinged as a "1" next 
         df = pd.DataFrame(0, index = self._nodes, columns= self._nodes)
 
         # Mark the connections using the value of 1

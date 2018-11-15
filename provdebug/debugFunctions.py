@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
+import requests
 import json
+import sys
 import re
 from .Parse import Parser
 from .Graph import Grapher
@@ -11,6 +13,41 @@ class ProvDebug:
     def __init__(self, filepath):
         self.prov = Parser(filepath)
         self.graph = Grapher(self.prov)
+
+    def errorTrace(self, stackOverflow = False):
+        retVal = pd.DataFrame()
+        dataNodes = self.prov.getDataNodes()
+
+        message = dataNodes[dataNodes["name"] == "error.msg"]["value"].values
+
+        if(len(message) > 0):
+            message = message[0]
+
+            if(stackOverflow):
+                pass
+
+            retVal = [message, self.lineage("error.msg")]
+        else:
+            print("There were no errors in this script!")
+
+        return(retVal)
+
+    # This function will query stack overflow for what is passed to it 
+    # in the argument 'query'
+    def _stackSearch(self, query, tagged, order = "desc", sort = "votes"):
+        request = ("http://api.stackexchange.com/2.2/search?" + 
+         "order=" + order +
+         "&sort=" + sort + 
+         "&tagged=" + tagged + 
+         "&intitle=" + query + 
+         "&site=stackoverflow")
+
+        rawResult = requests.get(request)
+
+        if(rawResult.status_code != 200):
+            sys.exit("Stackoverflow connection failed")
+
+        return(json.loads(rawResult.content))
 
     # This function takes variable names as inputs and returns 
     # a list of data frames with the lineage information for the
@@ -24,7 +61,7 @@ class ProvDebug:
         # the possible variables they could choose allows error
         # checking argument input
         posVars = self.prov.getDataNodes()
-        posVars = posVars[posVars.type.isin(["Data", "Snapshot"])]
+        posVars = posVars[posVars.type.isin(["Data", "Snapshot", "Exception"])]
         posVars = list(set(posVars['name']))
         
         posArgs = []
@@ -287,3 +324,5 @@ class ProvDebug:
             dfRow["name"] = np.nan
 
         return(dfRow)
+
+    
