@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import webbrowser
 import requests
 import json
 import sys
@@ -14,17 +15,161 @@ class ProvDebug:
         self.prov = Parser(filepath)
         self.graph = Grapher(self.prov)
 
+    def typeCheck(self, *args, onlyBool = False):
+
+        # Variable exist in the provenance information as 'Data'
+        # or 'Snapshot' types from the data nodes.
+        posVars = self.prov.getDataNodes()
+        posVars = posVars[posVars.type.isin(["Data", "Snapshot"])]
+        posVars = list(set(posVars['name']))
+        
+        posArgs = []
+
+        # Don't process variables that don't exist in the provenance
+        for arg in args:
+            if(arg in posVars):
+                posArgs.append(arg)
+        
+        retVal = {}
+
+        # Inform the user if they either passed no variables
+        # or if they passed variables not present
+        if(len(posArgs) == 0):
+            print("No variables were passed that matched variables from provenance.")
+            print("Possible variables have been returned instead.")
+            retVal = posVars
+        else:
+            for arg in posArgs:
+                retVal[arg] = self._getVarTypes(arg)
+
+                if(onlyBool):
+                    if(len(set(retVal[arg]["varType"].values)) == 1):
+                        retVal[arg] = True
+                    else:
+                        retVal[arg] = False
+            
+
+        return(retVal)
+    
+    # This is a helper function for the typeChecking function
+    # It takes a variable name and creates a dictionary out of it
+    # The keys of the dictionary correspond to columns of the data frame
+    # that the typeChecking function returns
+    def _getVarTypes(self, varName):
+
+        #For this function data nodes are used for grabbing the scope and valType information
+        dataNodes = self.prov.getDataNodes()
+
+        # The proc data edges allow the program to find what procedure nodes
+        # match with the data nodes that match with the passed variable
+        procData = self.prov.getProcData()
+
+        # The procedure nodes show what line the variable was assigned
+        procNodes = self.prov.getProcNodes()
+
+        # This separates out the data nodes that are only from the variable passed
+        matchedData = dataNodes[dataNodes["name"] == varName]
+
+        # This finds the procedure node labels that have an edge to the data nodes
+        matchedProcLabels = procData[procData.entity.isin(matchedData["label"].values)]["activity"].values
+
+        # This returns the procedure rows that have a connection to the data nodes
+        matchedProcNodes = procNodes[procNodes.label.isin(matchedProcLabels)]
+
+        # This dictionary has keys matching the columns for the final data frame
+        retVal = []
+        line = matchedProcNodes["startLine"].values
+        scope = matchedData["scope"].values
+        valTypes = matchedData["valType"].values
+
+        for index in range(0, len(line)):
+            dfRow = {}
+
+            dfRow["line"] = line[index]
+            dfRow["scope"] = scope[index]
+
+            try:
+                valType = json.loads(valTypes[index])
+                dfRow["container"] = valType["container"]
+                dfRow["dim"] = valType["dimension"]
+                dfRow["varType"] = valType["type"][0]
+            except ValueError:
+                dfRow["container"] = None
+                dfRow["dim"] = None
+                dfRow["varType"] = valTypes[index]
+
+            retVal.append(dfRow)
+        
+        cols = ["line", "varType", "container", "dim", "scope"]
+        return(pd.DataFrame(retVal)[cols])
+
+
+    # This function searches the provenance for an error message
+    # If one exists, it grabs it and prints the lineage.
+    # If they set stackoverflow to true it will find similar messages on 
+    # stackover flow, print them, and if the user chooses one 
+    # will open that page in on the webbrowser
     def errorTrace(self, stackOverflow = False):
         retVal = pd.DataFrame()
         dataNodes = self.prov.getDataNodes()
 
+        # Grab any possible error messages
         message = dataNodes[dataNodes["name"] == "error.msg"]["value"].values
 
+        # If there are no errors than message will be 0
         if(len(message) > 0):
+            # Grab the error from the numpy series since it is initally grabbed as
+            # a single element numpy series.
             message = message[0]
 
+            # If they choose to find similar messages using the stack exchange API
             if(stackOverflow):
-                pass
+                # Error messages tend to follow the format of:
+                # 'Personalized Info : more info 'personalized' info
+                # The personalized info should be removed, so first grab all 
+                # text after the colon
+                messageParts = message.split(":")
+
+                if(len(messageParts) == 2):
+                    del messageParts[0]
+                    message = ''.join(messageParts)
+
+
+                # Big oof
+                # This complicated mess of regex i=actually checks for 4 things (all inclusive):
+                # Matches to characters surronded by quotes "dog"
+                # Matches to characters surronded by escaped quotes \"dog\"
+                # Matches to characters surronded by single quotes 'dog'
+                # Matches to characters surronded by escaped quotes \'dog\'
+                exp = "\\\"[^\"\r]*\\\"|\"[^\"\r]*\"|\'[^\"\r]*\'|\\\'[^\"\r]*\\\'"
+
+                # This will remove all text between quotes since that information is what is personalized.
+                message = re.sub(exp, "", message)
+
+                result = self._stackSearch(message, "python")
+                result = pd.DataFrame(result["items"])
+                result = result.sort_values(by="score", ascending = False).head()
+                result.index = range(len(result.index))
+                print("Similar messages to " + message + ": ")
+
+                for number, title in enumerate(list(result["title"].values)):
+                    print(number + 1, title)
+
+                choice = -1
+                validInput = False
+                while(not validInput):
+                    choice = input("The number of the page to open (-1 to exit): ")
+                    try:
+                        choice = int(choice)
+                        validInput = True
+                    except:
+                        pass
+                    if(not (1 <= choice <= len(result.index) or choice == -1)):
+                        validInput = False
+
+                if(choice != -1):
+                    link = result.iloc[[choice - 1]]["link"].values[0]
+                    webbrowser.open(link)
 
             retVal = [message, self.lineage("error.msg")]
         else:
