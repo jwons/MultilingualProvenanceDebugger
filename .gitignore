@@ -112,3 +112,6 @@ dmypy.json
 
 #vscode
 .vscode
+
+# R stuff
+.Rhistory

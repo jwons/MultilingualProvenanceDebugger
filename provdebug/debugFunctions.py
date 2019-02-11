@@ -17,6 +17,12 @@ class ProvDebug:
 
     def typeCheck(self, *args, onlyBool = False):
 
+        # This value indicates whether or not the function was able to 
+        # succesfully query the variables or not. In the event it does not
+        # and this value gets changes to 1, the return value is all 
+        # the possible variables rather than the (incorrect) queried ones
+        retCode = 0
+
         # Variable exist in the provenance information as 'Data'
         # or 'Snapshot' types from the data nodes.
         posVars = self.prov.getDataNodes()
@@ -32,11 +38,10 @@ class ProvDebug:
         
         retVal = {}
 
-        # Inform the user if they either passed no variables
-        # or if they passed variables not present
+        # If they didn't input any valid arguments change the status code
+        # that lets the function caller know they are receiving the posVars
         if(len(posArgs) == 0):
-            print("No variables were passed that matched variables from provenance.")
-            print("Possible variables have been returned instead.")
+            retCode = 1
             retVal = posVars
         else:
             for arg in posArgs:
@@ -49,7 +54,7 @@ class ProvDebug:
                         retVal[arg] = False
             
 
-        return(retVal)
+        return(retCode, retVal)
     
     # This is a helper function for the typeChecking function
     # It takes a variable name and creates a dictionary out of it
@@ -113,6 +118,8 @@ class ProvDebug:
         retVal = pd.DataFrame()
         dataNodes = self.prov.getDataNodes()
 
+        returnCode = 0
+
         # Grab any possible error messages
         message = dataNodes[dataNodes["name"] == "error.msg"]["value"].values
 
@@ -173,9 +180,9 @@ class ProvDebug:
 
             retVal = [message, self.lineage("error.msg")]
         else:
-            print("There were no errors in this script!")
+            returnCode = 1
 
-        return(retVal)
+        return(returnCode, retVal)
 
     # This function will query stack overflow for what is passed to it 
     # in the argument 'query'
@@ -201,6 +208,8 @@ class ProvDebug:
     # inputted variable 
     def lineage(self, *args, forward = False):
 
+        returnCode = 0
+        
         # Variable exist in the provenance information as 'Data'
         # or 'Snapshot' types from the data nodes. Having all of 
         # the possible variables they could choose allows error
@@ -221,15 +230,14 @@ class ProvDebug:
         # Inform the user if they either passed no variables
         # or if they passed variables not present
         if(len(posArgs) == 0):
-            print("No variables were passed that matched variables from provenance.")
-            print("Possible variables have been returned instead.")
+            returnCode = 1
             retVal = posVars
         else:
             # Process the lineage for each variable they passed and then return it
             for result in posArgs:
                 retVal.append(self._grabLineage(result, forward))
 
-        return(retVal)
+        return(returnCode, retVal)
 
     # This is a helper function for the lineage function
     def _grabLineage(self, result, forward):
@@ -282,7 +290,7 @@ class ProvDebug:
     # variables referenced on a line, or the state of the entire execution
     # at the when the line was finihsed executing
     def fromLine(self, *args, state = False):
-
+        returnCode = 0
         # The procedure nodes store the line numbers, grab only 
         # operations to avoid NA values such as from start and end nodes
         procNodes = self.prov.getProcNodes()
@@ -310,13 +318,13 @@ class ProvDebug:
         retVals = []
 
         if (len(args) == 0):
-            print("No valid arguments were passed")
+            returnCode = 1
         else:
             # Process each line one at a time
             for arg in args:
                 retVals.append(self._grabLine(arg, state))
 
-        return(retVals)
+        return(returnCode, retVals)
     
     def _grabLine(self, lineNumber, state):
 
