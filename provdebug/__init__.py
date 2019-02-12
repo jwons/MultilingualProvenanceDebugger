@@ -1,3 +1,4 @@
 from .Parse import Parser
 from .Graph import Grapher
 from .debugFunctions import ProvDebug
+from .ProvBrowser import ProvBrowser
