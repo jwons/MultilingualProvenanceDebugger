@@ -1,4 +1,5 @@
 import os
+import natsort
 from .debugFunctions import ProvDebug
 
 # This class uses prov.json file to reconstruct a past execution 
@@ -22,9 +23,40 @@ class ProvBrowser:
         # will be the next node to advance to when a user prompts 
         self.procProcEdges = self.debugger.prov.getProcProc()
 
+        self._currentScope = 0
+
+        numOfScopes = 0
+        lastScope = [0]
+
+        self._scopeStack = []
+
+        procNodes = self.debugger.prov.getProcNodes()
+
+        for index, row in procNodes.iterrows():
+            print(index)
+            '''
+            if(row['type'] == "Start"):
+                self._scopeStack.append([])
+                self._scopeStack[self._currentScope].append({"row":row, "scopeChange":numOfScopes + 1})
+                lastScope.append(self._currentScope)
+                numOfScopes += 1
+                self._currentScope = numOfScopes
+            elif(row["type"] == "Finish"):
+                self._scopeStack[self._currentScope].append({"row":row, "scopeChange":lastScope[-1]})
+                self._currentScope = lastScope[-1]
+                del lastScope[-1]
+            else:
+                self._scopeStack[self._currentScope].append({"row":row, "scopeChange":self._currentScope})  
+            '''            
+            
+
         # This variable keeps track of the objects place in the simulated execution
         self.currentNode = self.procProcEdges.loc["pp1"]["informant"]
 
+    # This function can be called to advance the simulated execution by a single 
+    # procedure. By default it should not step into anything such as loops, sourced
+    # scripts, or other control structures. If it's called already at the end of the 
+    # nodes, it will return 1 rather than 0 and keep the same node number. 
     def nextNode(self):
         oldNode = self.currentNode
         returnCode = 0
@@ -36,6 +68,10 @@ class ProvBrowser:
 
         return returnCode
 
+    # This function can be called to back up the simulated execution by a single 
+    # procedure. By default it should not step into anything such as loops, sourced
+    # scripts, or other control structures. If it's called already at the start of the 
+    # nodes, it will return 1 rather than 0 and keep the same node number.
     def previousNode(self):
         oldNode = self.currentNode
         returnCode = 0

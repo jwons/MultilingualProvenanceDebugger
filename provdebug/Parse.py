@@ -57,7 +57,7 @@ class Parser:
 
         # Add the scripts sourced 
         d = dict((k, self._provData["environment"][k]) for k in ["sourcedScripts", "sourcedScriptTimeStamps"])
-        self._provElements["scripts"] = pd.DataFrame(data = d, index = range(0, len(d) - 1))
+        self._provElements["scripts"] = pd.DataFrame(data = d, index = range(0, len(d["sourcedScripts"])))
 
     # To process nodes/edges from the master list the same process can be used
     # for most of them. This function handles converting dicts to the necessary data frame.
@@ -83,7 +83,13 @@ class Parser:
 
     # Access function to get any part of the parsed provenance
     def getProvInfo(self, requestedProv):
-        return(self._provElements[requestedProv])
+        df = self._provElements[requestedProv]
+        try:
+            df = df.iloc[df.index.str.extract(r'(\d+)', expand=False).astype(int).argsort()]
+        except ValueError:
+            pass
+
+        return(df)
 
     def getEnvironment(self):
         return(self.getProvInfo("environment"))
