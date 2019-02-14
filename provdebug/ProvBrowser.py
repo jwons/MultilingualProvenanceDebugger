@@ -26,15 +26,15 @@ class ProvBrowser:
         self._currentScope = 0
 
         numOfScopes = 0
-        lastScope = [0]
+        lastScope = []
 
         self._scopeStack = []
+        self._scopeStack.append([])
 
         procNodes = self.debugger.prov.getProcNodes()
 
         for index, row in procNodes.iterrows():
-            print(index)
-            '''
+            
             if(row['type'] == "Start"):
                 self._scopeStack.append([])
                 self._scopeStack[self._currentScope].append({"row":row, "scopeChange":numOfScopes + 1})
@@ -42,50 +42,67 @@ class ProvBrowser:
                 numOfScopes += 1
                 self._currentScope = numOfScopes
             elif(row["type"] == "Finish"):
-                self._scopeStack[self._currentScope].append({"row":row, "scopeChange":lastScope[-1]})
+                self._scopeStack[self._currentScope][-1]["scopeChange"] = lastScope[-1]
                 self._currentScope = lastScope[-1]
+                #TODO This may be optional
+                self._scopeStack[self._currentScope].append({"row":row, "scopeChange":lastScope[-1]})
                 del lastScope[-1]
             else:
                 self._scopeStack[self._currentScope].append({"row":row, "scopeChange":self._currentScope})  
-            '''            
-            
 
+        '''
+        counter = 0
+        for scope in self._scopeStack:
+            print("Scope number: ", counter)
+            for row in scope:
+                print(row["row"]["label"], "| goes to:", row["scopeChange"])
+            counter += 1
+        '''
+
+        # Reset to ensure simulated code will start at beginning
+        self._currentScope = 0
         # This variable keeps track of the objects place in the simulated execution
-        self.currentNode = self.procProcEdges.loc["pp1"]["informant"]
+        # self.currentNode = self.procProcEdges.loc["pp1"]["informant"]
+        self.currentNodeIndex = 0
+
+        self.positionStack = []
+
+    def getCurrentNodeInfo(self):
+        return(self._scopeStack[self._currentScope][self.currentNodeIndex]["row"])
+
+    def stepIn(self):
+        if(self._scopeStack[self._currentScope][self.currentNodeIndex]["scopeChange"] != self._currentScope):
+            self.positionStack.append({"scope": self._currentScope, "node":self.currentNodeIndex})
+            self._currentScope = self._scopeStack[self._currentScope][self.currentNodeIndex]["scopeChange"]
+            self.currentNodeIndex = 0
+        else:
+            self.nextNode()
+    
+    def stepOut(self):
+        if(len(self.positionStack) > 0):
+            self.currentNodeIndex = self.positionStack[-1]["node"]
+            self._currentScope = self.positionStack[-1]["scope"]
+            del self.positionStack[-1]
 
     # This function can be called to advance the simulated execution by a single 
     # procedure. By default it should not step into anything such as loops, sourced
     # scripts, or other control structures. If it's called already at the end of the 
     # nodes, it will return 1 rather than 0 and keep the same node number. 
     def nextNode(self):
-        oldNode = self.currentNode
-        returnCode = 0
 
-        try:
-            self.currentNode = self.procProcEdges[self.procProcEdges["informant"] == oldNode]["informed"][0]
-        except IndexError:
-            returnCode = 1
-
-        return returnCode
+        if(self.currentNodeIndex + 1 < len(self._scopeStack[self._currentScope])):
+            self.currentNodeIndex += 1
+        elif(self.currentNodeIndex + 1 == len(self._scopeStack[self._currentScope]) and len(self.positionStack) > 0):
+            self.stepOut()       
 
     # This function can be called to back up the simulated execution by a single 
     # procedure. By default it should not step into anything such as loops, sourced
     # scripts, or other control structures. If it's called already at the start of the 
     # nodes, it will return 1 rather than 0 and keep the same node number.
     def previousNode(self):
-        oldNode = self.currentNode
-        returnCode = 0
 
-        try:
-            self.currentNode = self.procProcEdges[self.procProcEdges["informed"] == oldNode]["informant"][0]
-        except IndexError:
-            returnCode = 1
-
-        return returnCode
-
-
-        
-
-
-
+        if(self.currentNodeIndex - 1 > -1):
+            self.currentNodeIndex -= 1
+        elif(self.currentNodeIndex -1 == -1):
+            self.stepOut()
     
