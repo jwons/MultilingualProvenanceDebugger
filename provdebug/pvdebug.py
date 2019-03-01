@@ -10,6 +10,29 @@ def run():
 
     args = parser.parse_args() 
 
-    p_debugger = pvd.ProvDebug(args.file)
+    browser = pvd.ProvBrowser(args.file)
     
-    print(p_debugger.typeCheck("foo"))
+    print("Welcome to the Multilingual Provenance Debugger, type help for more information")
+
+    while(True):
+        userInput = input(">")
+
+        if(userInput == "help"):
+            #TODO Expand this info
+            print("This is a time-traveling language agnostic debugger. TODO for the developer, expand this info!")
+            continue
+        elif(userInput == "n" or userInput == "next"):
+            browser.nextNode()
+        elif(userInput == "b" or userInput == "back"):
+            browser.previousNode()
+        elif(userInput == "s" or userInput == "step"):
+            browser.stepIn()
+        elif(userInput == "o" or userInput == "out"):
+            browser.stepOut()
+        elif(userInput == "i" or userInput == "info"):
+            print(browser.getCurrentNodeInfo())
+            continue
+        elif(userInput == "quit"):
+            break
+
+        print(browser.getCurrentNodeInfo())
