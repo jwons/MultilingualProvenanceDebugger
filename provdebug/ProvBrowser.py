@@ -64,7 +64,7 @@ class ProvBrowser:
                 self._scopeStack[self._currentScope][-1]["scopeChange"] = lastScope[-1]
                 self._currentScope = lastScope[-1]
                 #TODO This may be optional
-                self._scopeStack[self._currentScope].append({"row":row, "scopeChange":lastScope[-1]})
+                #self._scopeStack[self._currentScope].append({"row":row, "scopeChange":lastScope[-1]})
                 del lastScope[-1]
             else:
                 self._scopeStack[self._currentScope].append({"row":row, "scopeChange":self._currentScope})  
@@ -77,8 +77,19 @@ class ProvBrowser:
 
         self.positionStack = []
 
+    # This function takes whatever node is currently selected and returns its 
+    # script num, line number, and then either script name or code line
     def getCurrentNodeInfo(self):
-        return(self._scopeStack[self._currentScope][self.currentNodeIndex]["row"])
+        data = self._scopeStack[self._currentScope][self.currentNodeIndex]["row"]
+        # If the script and line nums are NA it's the beginning of the script,
+        # set to 0 for now 
+        lineNum = data["startLine"]
+        if(lineNum == "NA"):
+            lineNum = "0"
+        scriptNum = data["scriptNum"]
+        if(scriptNum == "NA"):
+            scriptNum = 0
+        return('%s.%s. %s' %(scriptNum, lineNum, data["name"]))
 
     # This function sets the node information to be that of a node a single scope deeper, 
     # if possible. Otherwise it will just advance forward one node in the current scope
