@@ -132,3 +132,13 @@ class ProvBrowser:
         elif(self.currentNodeIndex -1 == -1):
             self.stepOut()
     
+    # This function lists all the variables that exist in the current point of execution
+    def getVarsFromCurrentLocation(self):
+        #self.debugger._varsByNode(self.)
+        currentNode = self._scopeStack[self._currentScope][self.currentNodeIndex]["row"]["label"]
+
+        df = self.debugger._constructDataFrameFromNodes(self.debugger._varsByNode(currentNode))
+
+        retVal = list(df["name"])
+
+        return(retVal)

@@ -14,6 +14,7 @@ class ProvDebug:
     def __init__(self, filepath):
         self.prov = Parser(filepath)
         self.graph = Grapher(self.prov)
+        self._procDataEdges = self.prov.getProcData()
 
     def typeCheck(self, *args, onlyBool = False):
 
@@ -288,16 +289,19 @@ class ProvDebug:
     # This function returns information about the values of variables
     # given a line from the program. It can either return all of the
     # variables referenced on a line, or the state of the entire execution
-    # at the when the line was finihsed executing
+    # at the when the line was finished executing
     def fromLine(self, *args, state = False):
         returnCode = 0
+
         # The procedure nodes store the line numbers, grab only 
         # operations to avoid NA values such as from start and end nodes
         procNodes = self.prov.getProcNodes()
-        self._procNodes = procNodes.loc[procNodes["type"] == "Operation"]
+        self._procNodes = procNodes.loc[procNodes["type"].isin(["Operation", "Start"])]
 
-        # The data edges are needed to grab vales from variables later on
+        '''
+        # The data edges are needed to grab values from variables later on
         self._procDataEdges = self.prov.getProcData()
+        '''
 
         # Cannot display the result of a file write in code so take it out
         dataNodes = self.prov.getDataNodes()
@@ -305,6 +309,7 @@ class ProvDebug:
         
         self._dataNodes = dataNodes.loc[dataNodes["type"] != "File"]
         
+        # Data to procedure edges show which data nodes are used during this procedure
         dataProcEdges = self.prov.getDataProc()
 
         self._dataProcEdges = dataProcEdges[~dataProcEdges['entity'].isin(fileDelete)]
@@ -312,6 +317,7 @@ class ProvDebug:
         # The start line has the lines needed when debugging, check for all the arguments
         # they passed to make sure they are possible lines
         posLines = list(self._procNodes["startLine"])
+        posLines = list(filter(lambda a: a != 'NA', posLines))
         args = pd.Series(args)
         args = list(args[args.isin(posLines)].values)
 
@@ -328,7 +334,6 @@ class ProvDebug:
     
     def _grabLine(self, lineNumber, state):
 
-        retVal = []
         nodes = []
 
         # When state is false, the user is looking for information regarding the values of the variables
@@ -368,6 +373,8 @@ class ProvDebug:
         else:
             node = self._procNodes[self._procNodes["startLine"] == lineNumber]["label"].values[0]
 
+            nodes = self._varsByNode(node)
+            '''
             entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"]
             if(len(entity) is not 0):
                 entity = entity.values[0]
@@ -409,7 +416,25 @@ class ProvDebug:
                 nodeNames = dataNodes[dataNodes["label"].isin(nodes)]["name"].values
                 tempDf = pd.DataFrame({"nodes":nodes, "names":nodeNames})
                 nodes = tempDf.drop_duplicates(subset=["names"], keep="last")["nodes"].values
+                
 
+        for node in nodes:
+            if(node[0] == "p"):
+                node = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values
+                if(len(node) is not 0):
+                    node = node[0]
+            retVal.append(self._processNode(node))
+        retVal = pd.DataFrame(retVal)
+        retVal = retVal.dropna()
+        cols = ["name", "value", "type", "container", "dimensions"]
+        return(retVal[cols])
+        '''
+        return(self._constructDataFrameFromNodes(nodes))
+
+    # This function takes a list of nodes and will collect each data node related to them 
+    # and construct them into a data frame. Used by fromLine and Browser
+    def _constructDataFrameFromNodes(self, nodes):
+        retVal = []
         for node in nodes:
             if(node[0] == "p"):
                 node = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values
@@ -426,20 +451,6 @@ class ProvDebug:
     # to a data frame
     def _processNode(self, entity):
 
-        '''
-        # When procedure nodes are passed to this helper, from line has been
-        # called by reference. 
-        if(node[0] == "p"): 
-            
-            # Find the entity the matches the procedure node that has been 
-            # passed to the helper function
-            entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values
-            if(len(entity) != 0):
-                entity = entity[0]
-        else:
-            entity = node
-        '''
-
         # This dict will hold a single row of the later 
         # to be data frame, the dicts will be collected into a list
         # and converted into a data frame
@@ -455,6 +466,10 @@ class ProvDebug:
         # If there is no entity then just assign the line to the name 
         # If there is an entity, grab it's info and populate the row
         if(len(entity) != 0):
+            if(not hasattr(self, "_dataNodes")):
+                dataNodes = self.prov.getDataNodes()
+                self._dataNodes = dataNodes.loc[dataNodes["type"] != "File"]
+
             varInfo = self._dataNodes[self._dataNodes["label"] == entity]
             dfRow["name"] = varInfo["name"].values[0]
             dfRow["value"] = varInfo["value"].values[0]
@@ -478,4 +493,53 @@ class ProvDebug:
 
         return(dfRow)
 
-    
+    # This function gathers all variables used in a procedure 
+    # based on the node 
+    def _varsByNode(self, node):
+
+        entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"]
+        if(len(entity) is not 0):
+            entity = entity.values[0]
+        while (len(entity) is 0):
+
+            # Grab the procedure nodes and procedure data edges so
+            # we can 'walk backward' through execution and grab the nodes
+            # previous to our current ones
+
+            procNodes = self.prov.getProcNodes()
+            allProcNodes = procNodes.loc[procNodes["type"].isin(["Operation", "Start"])]
+            allProcData = self.prov.getProcData()
+
+            # Currently the indices are set to the labels, reindex them to 
+            # ints so we can index through 
+            allProcNodes.index = range(len(allProcNodes.index))
+            newNodeIndex = allProcNodes[allProcNodes["label"] == node].index
+            if(len(newNodeIndex) == 0):
+                break
+            else:
+                newNodeIndex = newNodeIndex.values[0] - 1
+            node = allProcNodes.iloc[[newNodeIndex]]["label"].values[0]
+            entity = allProcData[allProcData["activity"] == node]["entity"]
+
+            if(len(entity) is not 0):
+                entity = entity.values[0]
+
+            if(newNodeIndex == 0 and len(entity) == 0):
+                break
+        
+        if(len(entity) is not 0):
+            dataNodes = self.prov.getDataNodes()
+            dataNodes = dataNodes.loc[dataNodes["type"] != "File"]
+
+            dataNodes.index = range(len(dataNodes.index))
+            rowNum = dataNodes[dataNodes["label"] == entity].index.values[0]
+            nodes = dataNodes.iloc[:rowNum + 1]["label"].values
+
+            # Account for duplicates by removing all but the tail
+            nodeNames = dataNodes[dataNodes["label"].isin(nodes)]["name"].values
+            tempDf = pd.DataFrame({"nodes":nodes, "names":nodeNames})
+            nodes = tempDf.drop_duplicates(subset=["names"], keep="last")["nodes"].values
+
+        return(nodes)
+
+        

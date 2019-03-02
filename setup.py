@@ -17,7 +17,7 @@ setup(name='provdebug',
     ],
     entry_points = {
      'console_scripts': [
-         'pvdebug = provdebug.pvdebug:run'
+         'provdb = provdebug.pvdebug:run'
      ],
     },
     zip_safe=False)
