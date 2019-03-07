@@ -115,6 +115,7 @@ class ProvDebug:
     # If they set stackoverflow to true it will find similar messages on 
     # stackover flow, print them, and if the user chooses one 
     # will open that page in on the webbrowser
+    #TODO move some of interactivity outside of this class. 
     def errorTrace(self, stackOverflow = False):
         retVal = pd.DataFrame()
         dataNodes = self.prov.getDataNodes()
@@ -144,7 +145,7 @@ class ProvDebug:
 
 
                 # Big oof
-                # This complicated mess of regex i=actually checks for 4 things (all inclusive):
+                # This complicated mess of regex actually checks for 4 things (all inclusive):
                 # Matches to characters surronded by quotes "dog"
                 # Matches to characters surronded by escaped quotes \"dog\"
                 # Matches to characters surronded by single quotes 'dog'
@@ -154,6 +155,8 @@ class ProvDebug:
                 # This will remove all text between quotes since that information is what is personalized.
                 message = re.sub(exp, "", message)
 
+                # Call to this function passes the parsed message to the StackExchange API
+                #TODO change depending on language
                 result = self._stackSearch(message, "python")
                 result = pd.DataFrame(result["items"])
                 result = result.sort_values(by="score", ascending = False).head()
@@ -298,11 +301,6 @@ class ProvDebug:
         procNodes = self.prov.getProcNodes()
         self._procNodes = procNodes.loc[procNodes["type"].isin(["Operation", "Start"])]
 
-        '''
-        # The data edges are needed to grab values from variables later on
-        self._procDataEdges = self.prov.getProcData()
-        '''
-
         # Cannot display the result of a file write in code so take it out
         dataNodes = self.prov.getDataNodes()
         fileDelete = list(dataNodes.loc[dataNodes["type"] == "File"]["label"])
@@ -332,8 +330,15 @@ class ProvDebug:
 
         return(returnCode, retVals)
     
+    # This function is a helper function to the fromLine function. It has two parts,
+    # the first is dependent on whether the user is looking for variables from a single 
+    # line or up to that point in execution. If the user is looking for variables from a 
+    # single line then all associated 
     def _grabLine(self, lineNumber, state):
-
+        
+        # This variable will hold all of the nodes that are found to be relevant 
+        # for the passed in line number. This list is passed to another helper function
+        # that will grab the associated data nodes and construct a data frame from it
         nodes = []
 
         # When state is false, the user is looking for information regarding the values of the variables
@@ -353,7 +358,8 @@ class ProvDebug:
             for node in nodes:
                 referencedEntity = self._dataProcEdges[self._dataProcEdges["activity"] == node]["entity"].values
 
-                referencedNode = 'nan'
+                #TODO replace with None?
+                referencedNode = 'nan'      
 
                 if (len(referencedEntity) > 0):
                     referencedNode = self._procDataEdges[self._procDataEdges["entity"].isin(referencedEntity)]["activity"].values
@@ -362,7 +368,7 @@ class ProvDebug:
                 
                 referencedNodes = np.append(referencedNodes, referencedNode)
             
-            # Combone the found nodes with the line's node
+            # Combine the found nodes with the line's node
             referencedNodes = np.append(referencedNodes, nodes)
             # remove any blank nodes that may have been added in the search for 
             # referenced nodes 
@@ -374,65 +380,12 @@ class ProvDebug:
             node = self._procNodes[self._procNodes["startLine"] == lineNumber]["label"].values[0]
 
             nodes = self._varsByNode(node)
-            '''
-            entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"]
-            if(len(entity) is not 0):
-                entity = entity.values[0]
 
-            while (len(entity) is 0):
-                # Grab the procedure nodes and procedure data edges so
-                # we can 'walk backward' through execution and grab the nodes
-                # previous to our current ones
-                allProcNodes = self._procNodes[self._procNodes["type"] == "Operation"]
-                allProcData = self.prov.getProcData()
-
-                # Currently the indices are set to the labels, reindex them to 
-                # ints so we can index through 
-                allProcNodes.index = range(len(allProcNodes.index))
-                newNodeIndex = allProcNodes[allProcNodes["label"] == node].index
-                if(len(newNodeIndex) == 0):
-                    break
-                else:
-                    newNodeIndex = newNodeIndex.values[0] - 1
-                node = allProcNodes.iloc[[newNodeIndex]]["label"].values[0]
-
-                entity = allProcData[allProcData["activity"] == node]["entity"]
-                if(len(entity) is not 0):
-                    entity = entity.values[0]
-                if(newNodeIndex == 0 and len(entity) == 0):
-                    break
-            
-            if(len(entity) is not 0):
-                
-                # Find preceding data nodes and subset them out
-                dataNodes = self._dataNodes
-                dataNodes.index = range(len(dataNodes.index))
-
-                rowNum = dataNodes[dataNodes["label"] == entity].index.values[0]
-
-                nodes = dataNodes.iloc[:rowNum + 1]["label"].values
-
-                # Account for duplicates by removing all but the tail
-                nodeNames = dataNodes[dataNodes["label"].isin(nodes)]["name"].values
-                tempDf = pd.DataFrame({"nodes":nodes, "names":nodeNames})
-                nodes = tempDf.drop_duplicates(subset=["names"], keep="last")["nodes"].values
-                
-
-        for node in nodes:
-            if(node[0] == "p"):
-                node = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"].values
-                if(len(node) is not 0):
-                    node = node[0]
-            retVal.append(self._processNode(node))
-        retVal = pd.DataFrame(retVal)
-        retVal = retVal.dropna()
-        cols = ["name", "value", "type", "container", "dimensions"]
-        return(retVal[cols])
-        '''
         return(self._constructDataFrameFromNodes(nodes))
 
     # This function takes a list of nodes and will collect each data node related to them 
-    # and construct them into a data frame. Used by fromLine and Browser
+    # and construct them into a data frame. Used by fromLine and getVarsFromCurrentLocation 
+    # in the ProvBrowser
     def _constructDataFrameFromNodes(self, nodes):
         retVal = []
         for node in nodes:
@@ -494,7 +447,8 @@ class ProvDebug:
         return(dfRow)
 
     # This function gathers all variables used in a procedure 
-    # based on the node 
+    # based on the node. Should always be passed a proc node.
+    # Used by fromLine and getVarsFromCurrentLocation in the ProvBrowser
     def _varsByNode(self, node):
 
         entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"]

@@ -104,6 +104,8 @@ class ProvBrowser:
         else:
             self.nextNode()
     
+    # This function checks to see if the simulated execution has stepped into some 
+    # sort of control structure. If it has, it will attempt to return to where it stepped in from. 
     def stepOut(self):
         if(len(self.positionStack) > 0):
             self.currentNodeIndex = self.positionStack[-1]["node"]
@@ -122,7 +124,7 @@ class ProvBrowser:
             self.stepOut()       
 
     # This function can be called to back up the simulated execution by a single 
-    # procedure. By default it should not step into anything such as loops, sourced
+    # procedure node. By default it should not step into anything such as loops, sourced
     # scripts, or other control structures. If it's called already at the start of the 
     # nodes, it will return 1 rather than 0 and keep the same node number.
     def previousNode(self):
@@ -134,11 +136,29 @@ class ProvBrowser:
     
     # This function lists all the variables that exist in the current point of execution
     def getVarsFromCurrentLocation(self):
-        #self.debugger._varsByNode(self.)
+
+        # Finds the label of the current proc node based off the class' scope and node index
         currentNode = self._scopeStack[self._currentScope][self.currentNodeIndex]["row"]["label"]
 
-        df = self.debugger._constructDataFrameFromNodes(self.debugger._varsByNode(currentNode))
-
-        retVal = list(df["name"])
+        # Passes the current node to helper function defined in the ProvDebug class
+        retVal = self.debugger._constructDataFrameFromNodes(self.debugger._varsByNode(currentNode))
 
         return(retVal)
+
+    # This function takes a comma-separated string of variables passed by the user and 
+    # passes the variables to the lineage function and then returns the resulting data frames.
+    def getVariableLineage(self, args):
+
+        # Since the user will be sending a comma separated value string, 
+        # each variable can be grabbed by splitting on the commas
+        vars = args.split(',')
+
+        retVal = self.debugger.lineage(vars)
+
+        return(retVal)
+
+    # This function uses the data frame returned by getVarsFromCurrentLocation
+    # and returns only the variable names in a list
+    def getVarNamesFromCurrentLocation(self):
+
+        return(list(self.getVarsFromCurrentLocation()["name"]))
