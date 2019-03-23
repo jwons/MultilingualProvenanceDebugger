@@ -145,15 +145,12 @@ class ProvBrowser:
 
         return(retVal)
 
+
     # This function takes a comma-separated string of variables passed by the user and 
     # passes the variables to the lineage function and then returns the resulting data frames.
     def getVariableLineage(self, args):
 
-        # Since the user will be sending a comma separated value string, 
-        # each variable can be grabbed by splitting on the commas
-        vars = args.split(',')
-
-        retVal = self.debugger.lineage(vars)
+        retVal = self.debugger.lineage(args)
 
         return(retVal)
 

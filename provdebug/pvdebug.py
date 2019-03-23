@@ -16,6 +16,7 @@ def run():
             - o or out: step out of code block
             - i or info: get current script, line number, and code block
             - v or vars: prints all variables that exist at current location
+            - l or lineage [variables]: prints the lineage of each space-separated variable passed to it 
             - q or quit: quit the debugger
         ''')
     parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
@@ -56,8 +57,15 @@ def run():
             continue
         elif(userFlag == "l" or userFlag == "lineage"):
             if(len(userChoices) > 1):
-                #TODO figure out how to match input to lineage variables
-                dfs = browser.getVariableLineage(userChoices[1])
+
+                dfs = browser.getVariableLineage(userChoices[1:])
+
+                if(dfs[0] == 1):
+                    print("Possible variables to check:")
+                    print(dfs[1])
+                else:
+                    for result in dfs[1]:
+                        print(result)
             else:
                 print("Please specify a variable or variables to find the lineage for.")
             continue

@@ -224,15 +224,22 @@ class ProvDebug:
         
         posArgs = []
 
+        # Flattens the arguments in case a list of variables is passed.
+        # thanks Alex Martelli and Jack Moody on Stack Overflow for 
+        # the list comprehension method of doing this
+        args = list(args)
+        flat_list = [item for sublist in args for item in sublist]
+
         # Don't process variables that don't exist in the provenance
-        for arg in args:
+        for arg in flat_list:
             if(arg in posVars):
                 posArgs.append(arg)
         
         retVal = []
 
         # Inform the user if they either passed no variables
-        # or if they passed variables not present
+        # or if they passed variables not present. Return value of 
+        # 1 means that possible variables have been returned 
         if(len(posArgs) == 0):
             returnCode = 1
             retVal = posVars
