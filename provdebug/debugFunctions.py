@@ -115,78 +115,68 @@ class ProvDebug:
     # If they set stackoverflow to true it will find similar messages on 
     # stackover flow, print them, and if the user chooses one 
     # will open that page in on the webbrowser
-    #TODO move some of interactivity outside of this class. 
     def errorTrace(self, stackOverflow = False):
         retVal = pd.DataFrame()
-        dataNodes = self.prov.getDataNodes()
 
         returnCode = 0
 
-        # Grab any possible error messages
-        message = dataNodes[dataNodes["name"] == "error.msg"]["value"].values
-
+        message = self._procesError()
         # If there are no errors than message will be 0
         if(len(message) > 0):
             # Grab the error from the numpy series since it is initally grabbed as
             # a single element numpy series.
             message = message[0]
 
-            # If they choose to find similar messages using the stack exchange API
-            if(stackOverflow):
-                # Error messages tend to follow the format of:
-                # 'Personalized Info : more info 'personalized' info
-                # The personalized info should be removed, so first grab all 
-                # text after the colon
-                messageParts = message.split(":")
-
-                if(len(messageParts) == 2):
-                    del messageParts[0]
-                    message = ''.join(messageParts)
-
-
-                # Big oof
-                # This complicated mess of regex actually checks for 4 things (all inclusive):
-                # Matches to characters surronded by quotes "dog"
-                # Matches to characters surronded by escaped quotes \"dog\"
-                # Matches to characters surronded by single quotes 'dog'
-                # Matches to characters surronded by escaped quotes \'dog\'
-                exp = "\\\"[^\"\r]*\\\"|\"[^\"\r]*\"|\'[^\"\r]*\'|\\\'[^\"\r]*\\\'"
-
-                # This will remove all text between quotes since that information is what is personalized.
-                message = re.sub(exp, "", message)
-
-                # Call to this function passes the parsed message to the StackExchange API
-                #TODO change depending on language
-                result = self._stackSearch(message, "python")
-                result = pd.DataFrame(result["items"])
-                result = result.sort_values(by="score", ascending = False).head()
-                result.index = range(len(result.index))
-                print("Similar messages to " + message + ": ")
-
-                for number, title in enumerate(list(result["title"].values)):
-                    print(number + 1, title)
-
-                choice = -1
-                validInput = False
-                while(not validInput):
-                    choice = input("The number of the page to open (-1 to exit): ")
-                    try:
-                        choice = int(choice)
-                        validInput = True
-                    except:
-                        pass
-                    if(not (1 <= choice <= len(result.index) or choice == -1)):
-                        validInput = False
-
-                if(choice != -1):
-                    link = result.iloc[[choice - 1]]["link"].values[0]
-                    webbrowser.open(link)
-
             retVal = [message, self.lineage("error.msg")]
         else:
             returnCode = 1
 
         return(returnCode, retVal)
+
+    def _procesError(self):
+        dataNodes = self.prov.getDataNodes()
+
+        # Grab any possible error messages
+        return(dataNodes[dataNodes["name"] == "error.msg"]["value"].values)
+
+
+    def errorSearch(self):
+        message = self._procesError()[0]
+        # If they choose to find similar messages using the stack exchange API
+ 
+        # Error messages tend to follow the format of:
+        # 'Personalized Info : more info 'personalized' info
+        # The personalized info should be removed, so first grab all 
+        # text after the colon
+        messageParts = message.split(":")
+        if(len(messageParts) == 2):
+            del messageParts[0]
+            message = ''.join(messageParts)
+
+        # Big oof
+        # This complicated mess of regex actually checks for 4 things (all inclusive):
+        # Matches to characters surronded by quotes "dog"
+        # Matches to characters surronded by escaped quotes \"dog\"
+        # Matches to characters surronded by single quotes 'dog'
+        # Matches to characters surronded by escaped quotes \'dog\'
+        exp = "\\\"[^\"\r]*\\\"|\"[^\"\r]*\"|\'[^\"\r]*\'|\\\'[^\"\r]*\\\'"
+
+        # This will remove all text between quotes since that information is what is personalized.
+        message = re.sub(exp, "", message)
+        language = self.prov.getEnvironment().loc["language"][0]
+
+        # Call to this function passes the parsed message to the StackExchange API
+        result = self._stackSearch(message, language)
+        result = pd.DataFrame(result["items"])
+        result = result.sort_values(by="score", ascending = False).head()
+        result.index = range(len(result.index))
+        return(message, result)
+
+    # takes the result returned from error search with a choice given by the user
+    def openStackSearch(self, result, choice):
+        link = result.iloc[[choice - 1]]["link"].values[0]
+        webbrowser.open(link)
+
 
     # This function will query stack overflow for what is passed to it 
     # in the argument 'query'
@@ -203,7 +193,16 @@ class ProvDebug:
         if(rawResult.status_code != 200):
             sys.exit("Stackoverflow connection failed")
 
-        return(json.loads(rawResult.content))
+        return(json.loads(rawResult.content.decode(rawResult.encoding)))
+
+
+    def flatten(self, toFlatten):
+        for x in toFlatten:
+            if hasattr(x, '__iter__') and not isinstance(x, str):
+                for y in self.flatten(x):
+                    yield y
+            else:
+                yield x
 
     # This function takes variable names as inputs and returns 
     # a list of data frames with the lineage information for the
@@ -227,8 +226,10 @@ class ProvDebug:
         # Flattens the arguments in case a list of variables is passed.
         # thanks Alex Martelli and Jack Moody on Stack Overflow for 
         # the list comprehension method of doing this
+        #TODO nevermind the thanks, I don't want it. It makes strings into chars
         args = list(args)
-        flat_list = [item for sublist in args for item in sublist]
+        flat_list = self.flatten(args)
+        #flat_list = [item for sublist in args for item in sublist]
 
         # Don't process variables that don't exist in the provenance
         for arg in flat_list:
@@ -502,5 +503,3 @@ class ProvDebug:
             nodes = tempDf.drop_duplicates(subset=["names"], keep="last")["nodes"].values
 
         return(nodes)
-
-        

@@ -4,6 +4,7 @@ import textwrap
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 import provdebug as pvd 
+import readline
 
 def run():
     helpText = textwrap.dedent('''\
@@ -17,15 +18,30 @@ def run():
             - i or info: get current script, line number, and code block
             - v or vars: prints all variables that exist at current location
             - l or lineage [variables]: prints the lineage of each space-separated variable passed to it 
+            - so or search: searches a scripts error message on Stack Overflow 
             - q or quit: quit the debugger
         ''')
     parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
     formatter_class=RawDescriptionHelpFormatter,
     epilog=helpText)
+    #TODO make sure this is deleted, it is only for debuggin purposes
+    '''
+    parser.add_argument('--interactive', action='store_true', default=True)
+    (args, rest) = parser.parse_known_args()
+    if args.interactive:
+        try: readline.read_history_file()
+        except: pass
+        rest += input("Arguments: ").split(" ")  # get input args
+        try: readline.write_history_file()
+        except: pass
+    '''
     parser.add_argument("-f", "--file", dest="file", required=True,
                         help="Prov.Json file to analyze")
 
+    #args = parser.parse_args(rest) 
+
     args = parser.parse_args() 
+
 
     browser = pvd.ProvBrowser(args.file)
     
@@ -68,6 +84,24 @@ def run():
                         print(result)
             else:
                 print("Please specify a variable or variables to find the lineage for.")
+            continue
+        elif(userFlag == "so" or userFlag == "search"):
+            code, result = browser.debugger.errorSearch()
+            for number, title in enumerate(list(result["title"].values)):
+                print(number + 1, title)
+            choice = -1
+            validInput = False
+            while(not validInput):
+                choice = input("The number of the page to open (-1 to exit): ")
+                try:
+                    choice = int(choice)
+                    validInput = True
+                except:
+                    pass
+                if(not (1 <= choice <= len(result.index) or choice == -1)):
+                    validInput = False
+            if(choice != -1):
+                browser.debugger.openStackSearch(result, choice)
             continue
         elif(userFlag == "q" or userFlag == "quit"):
             break

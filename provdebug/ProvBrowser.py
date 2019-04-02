@@ -159,3 +159,4 @@ class ProvBrowser:
     def getVarNamesFromCurrentLocation(self):
 
         return(list(self.getVarsFromCurrentLocation()["name"]))
+    
