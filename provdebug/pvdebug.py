@@ -24,7 +24,7 @@ def run():
     parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
     formatter_class=RawDescriptionHelpFormatter,
     epilog=helpText)
-    #TODO make sure this is deleted, it is only for debuggin purposes
+    #Uncomment the following to debug
     '''
     parser.add_argument('--interactive', action='store_true', default=True)
     (args, rest) = parser.parse_known_args()
@@ -70,6 +70,15 @@ def run():
             continue
         elif(userFlag == "i" or userFlag == "info"):
             print(browser.getCurrentNodeInfo())
+            continue
+        elif(userFlag == "p" or userFlag == "print"):
+            vars = browser.getVarsFromCurrentLocation()
+            varNames = userChoices[1:len(userChoices)]
+            if(len(varNames) == 0):
+                print("Please enter the name of a variable to see its value")
+                continue
+            selectedVars = vars[vars["name"].isin(varNames)]
+            print(selectedVars)
             continue
         elif(userFlag == "l" or userFlag == "lineage"):
             if(len(userChoices) > 1):
