@@ -18,7 +18,8 @@ def run():
             - i or info: get current script, line number, and code block
             - v or vars: prints all variables that exist at current location
             - l or lineage [variables]: prints the lineage of each space-separated variable passed to it 
-            - so or search: searches a scripts error message on Stack Overflow 
+            - p or print [variables]: prints the values of each space-separated variable passed to it
+            - so or search: searches a script's error message on Stack Overflow
             - q or quit: quit the debugger
         ''')
     parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
@@ -46,6 +47,8 @@ def run():
     browser = pvd.ProvBrowser(args.file)
     
     print("Welcome to the Multilingual Provenance Debugger, type help for more information")
+    browser.stepIn()
+    print(browser.getCurrentNodeInfo())
 
     while(True):
         userInput = input(">")
