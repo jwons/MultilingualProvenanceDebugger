@@ -402,9 +402,13 @@ class ProvDebug:
                 if(len(node) is not 0):
                     node = node[0]
             retVal.append(self._processNode(node))
-        retVal = pd.DataFrame(retVal)
-        retVal = retVal.dropna()
         cols = ["name", "value", "type", "container", "dimensions"]
+        if(len(retVal) is 0):
+            retVal = pd.DataFrame(columns=["name", "value", "type", "container", "dimensions"])
+        else:
+            retVal = pd.DataFrame(retVal)
+            retVal = retVal.dropna()
+        
         return(retVal[cols])
 
     # This helper function is used to find information about the node
@@ -446,9 +450,15 @@ class ProvDebug:
             else:
                 valType = json.loads(varInfo["valType"].values[0])
 
+                keys = valType.keys()
+
+                for key in keys:
+                    dfRow[key] = valType[key]
+                '''
                 dfRow["container"] = valType["container"]
                 dfRow["dimensions"] = valType["dimension"][0]
                 dfRow["type"] = valType["type"][0]
+                '''
         else:
             dfRow["name"] = np.nan
 
@@ -501,5 +511,7 @@ class ProvDebug:
             nodeNames = dataNodes[dataNodes["label"].isin(nodes)]["name"].values
             tempDf = pd.DataFrame({"nodes":nodes, "names":nodeNames})
             nodes = tempDf.drop_duplicates(subset=["names"], keep="last")["nodes"].values
+        else:
+            nodes = []
 
         return(nodes)

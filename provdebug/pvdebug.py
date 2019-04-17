@@ -26,7 +26,7 @@ def run():
     formatter_class=RawDescriptionHelpFormatter,
     epilog=helpText)
     #Uncomment the following to debug
-    '''
+    
     parser.add_argument('--interactive', action='store_true', default=True)
     (args, rest) = parser.parse_known_args()
     if args.interactive:
@@ -35,13 +35,13 @@ def run():
         rest += input("Arguments: ").split(" ")  # get input args
         try: readline.write_history_file()
         except: pass
-    '''
+    
     parser.add_argument("-f", "--file", dest="file", required=True,
                         help="Prov.Json file to analyze")
 
-    #args = parser.parse_args(rest) 
+    args = parser.parse_args(rest) 
 
-    args = parser.parse_args() 
+    #args = parser.parse_args() 
 
 
     browser = pvd.ProvBrowser(args.file)
