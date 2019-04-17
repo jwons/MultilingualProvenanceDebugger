@@ -1,0 +1,1096 @@
+{
+	"prefix": {
+		"prov": "http://www.w3.org/ns/prov#",
+		"rdt": "http://rdatatracker.org/"
+	},
+
+	"agent" : {
+		// agent: this json file and the tool that produced this
+		"rdt:a1": {
+			"rdt:tool.name": "rdt",
+			"rdt:tool.version": "3.0.2",
+			"rdt:json.version": "2.1"
+		}
+	},
+
+	"activity" : {
+		// procedure nodes
+		"rdt:p1": {
+			"rdt:name": "plotData.R",
+			"rdt:type": "Start",
+			"rdt:elapsedTime": 1.2,
+			"rdt:scriptNum": "NA",
+			"rdt:startLine": "NA",
+			"rdt:startCol": "NA",
+			"rdt:endLine": "NA",
+			"rdt:endCol": "NA"
+		},
+		"rdt:p2": {
+			"rdt:name": "library(sp)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.377,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 1,
+			"rdt:startCol": 1,
+			"rdt:endLine": 1,
+			"rdt:endCol": 11
+		},
+		"rdt:p3": {
+			"rdt:name": "library(maptools)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.387,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 2,
+			"rdt:startCol": 1,
+			"rdt:endLine": 2,
+			"rdt:endCol": 17
+		},
+		"rdt:p4": {
+			"rdt:name": "library(rhdf5)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.393,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 3,
+			"rdt:startCol": 1,
+			"rdt:endLine": 3,
+			"rdt:endCol": 14
+		},
+		"rdt:p5": {
+			"rdt:name": "library(rgdal)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.399,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 4,
+			"rdt:startCol": 1,
+			"rdt:endLine": 4,
+			"rdt:endCol": 14
+		},
+		"rdt:p6": {
+			"rdt:name": "library(rgeos)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.405,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 5,
+			"rdt:startCol": 1,
+			"rdt:endLine": 5,
+			"rdt:endCol": 14
+		},
+		"rdt:p7": {
+			"rdt:name": "library(raster)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.412,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 6,
+			"rdt:startCol": 1,
+			"rdt:endLine": 6,
+			"rdt:endCol": 15
+		},
+		"rdt:p8": {
+			"rdt:name": "file.by.day <- list.files(path = \"data\")",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.42,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 8,
+			"rdt:startCol": 1,
+			"rdt:endLine": 8,
+			"rdt:endCol": 40
+		},
+		"rdt:p9": {
+			"rdt:name": "file.by.day <- lapply(file.by.day, function(file) {\tfile.",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.445,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 9,
+			"rdt:startCol": 1,
+			"rdt:endLine": 11,
+			"rdt:endCol": 2
+		},
+		"rdt:p10": {
+			"rdt:name": "shapes <- list()",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.461,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 14,
+			"rdt:startCol": 1,
+			"rdt:endLine": 14,
+			"rdt:endCol": 16
+		},
+		"rdt:p11": {
+			"rdt:name": "sif <- vector()",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.479,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 15,
+			"rdt:startCol": 1,
+			"rdt:endLine": 15,
+			"rdt:endCol": 15
+		},
+		"rdt:p12": {
+			"rdt:name": "datetime <- vector()",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.494,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 16,
+			"rdt:startCol": 1,
+			"rdt:endLine": 16,
+			"rdt:endCol": 20
+		},
+		"rdt:p13": {
+			"rdt:name": "id <- 0",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.51,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 17,
+			"rdt:startCol": 1,
+			"rdt:endLine": 17,
+			"rdt:endCol": 7
+		},
+		"rdt:p14": {
+			"rdt:name": "print(paste(\"Reading from \", as.character(length(file.by.day",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 1.523,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 19,
+			"rdt:startCol": 1,
+			"rdt:endLine": 19,
+			"rdt:endCol": 84
+		},
+		"rdt:p15": {
+			"rdt:name": "shapes <- unlist(lapply(file.by.day, function(file) {\tpri",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 2750.85,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 21,
+			"rdt:startCol": 1,
+			"rdt:endLine": 34,
+			"rdt:endCol": 18
+		},
+		"rdt:p16": {
+			"rdt:name": "print(\"Files loaded, starting to create Spatial Polygons\")",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 2789.374,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 36,
+			"rdt:startCol": 1,
+			"rdt:endLine": 36,
+			"rdt:endCol": 58
+		},
+		"rdt:p17": {
+			"rdt:name": "sp_poly <- SpatialPolygons(lapply(shapes, function(poly) {  ",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4745.54,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 37,
+			"rdt:startCol": 1,
+			"rdt:endLine": 39,
+			"rdt:endCol": 5
+		},
+		"rdt:p18": {
+			"rdt:name": "print(\"Spatial Polygons created\")",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4745.781,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 41,
+			"rdt:startCol": 1,
+			"rdt:endLine": 41,
+			"rdt:endCol": 33
+		},
+		"rdt:p19": {
+			"rdt:name": "sif.df <- data.frame(sif)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4745.797,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 43,
+			"rdt:startCol": 1,
+			"rdt:endLine": 43,
+			"rdt:endCol": 25
+		},
+		"rdt:p20": {
+			"rdt:name": "time.df <- data.frame(datetime)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4745.847,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 44,
+			"rdt:startCol": 1,
+			"rdt:endLine": 44,
+			"rdt:endCol": 31
+		},
+		"rdt:p21": {
+			"rdt:name": "pid <- sapply(slot(sp_poly, \"polygons\"), function(x) slot(x,",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4772.727,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 46,
+			"rdt:startCol": 1,
+			"rdt:endLine": 46,
+			"rdt:endCol": 67
+		},
+		"rdt:p22": {
+			"rdt:name": "row.names(sif.df) <- pid",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4778.599,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 48,
+			"rdt:startCol": 1,
+			"rdt:endLine": 48,
+			"rdt:endCol": 24
+		},
+		"rdt:p23": {
+			"rdt:name": "row.names(time.df) <- pid",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4784.2,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 49,
+			"rdt:startCol": 1,
+			"rdt:endLine": 49,
+			"rdt:endCol": 25
+		},
+		"rdt:p24": {
+			"rdt:name": "data.df <- cbind(sif.df, time.df)",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4805.951,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 51,
+			"rdt:startCol": 1,
+			"rdt:endLine": 51,
+			"rdt:endCol": 33
+		},
+		"rdt:p25": {
+			"rdt:name": "sp.poly.df <- SpatialPolygonsDataFrame(sp_poly, data = data.",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 4910.929,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 53,
+			"rdt:startCol": 1,
+			"rdt:endLine": 53,
+			"rdt:endCol": 63
+		},
+		"rdt:p26": {
+			"rdt:name": "print(\"Spatial Polygons Data Frame Created\")",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 5038.843,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 55,
+			"rdt:startCol": 1,
+			"rdt:endLine": 55,
+			"rdt:endCol": 44
+		},
+		"rdt:p27": {
+			"rdt:name": "midweast.area <- readOGR(dsn = \"GIS Files/Midweast.shp\")",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 6225.051,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 57,
+			"rdt:startCol": 1,
+			"rdt:endLine": 57,
+			"rdt:endCol": 56
+		},
+		"rdt:p28": {
+			"rdt:name": "proj4string(sp.poly.df) <- \"+proj=longlat +datum=WGS84 +no_d",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 6225.208,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 59,
+			"rdt:startCol": 1,
+			"rdt:endLine": 59,
+			"rdt:endCol": 92
+		},
+		"rdt:p29": {
+			"rdt:name": "sp.poly.df <- spTransform(sp.poly.df, CRS(proj4string(midwea",
+			"rdt:type": "Operation",
+			"rdt:elapsedTime": 9425.248,
+			"rdt:scriptNum": 1,
+			"rdt:startLine": 61,
+			"rdt:startCol": 1,
+			"rdt:endLine": 61,
+			"rdt:endCol": 70
+		},
+		"rdt:p30": {
+			"rdt:name": "plotData.R",
+			"rdt:type": "Finish",
+			"rdt:elapsedTime": 9450.592,
+			"rdt:scriptNum": "NA",
+			"rdt:startLine": "NA",
+			"rdt:startCol": "NA",
+			"rdt:endLine": "NA",
+			"rdt:endCol": "NA"
+		}
+	},
+
+	"entity" : {
+		// data nodes
+		"rdt:d1": {
+			"rdt:name": "file.by.day",
+			"rdt:value": "\"oco2_LtSIF_150530_B8100r_171011080504s.nc4\" \"oco2_LtSIF_150531_B8100r_171011080...",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[121], \"type\":[\"character\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d2": {
+			"rdt:name": "file.by.day",
+			"rdt:value": "\"data/oco2_LtSIF_150530_B8100r_171011080504s.nc4\" \"data/oco2_LtSIF_150531_B8100r...",
+			"rdt:valType": "{\"container\":\"list\", \"dimension\":[121]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d3": {
+			"rdt:name": "shapes",
+			"rdt:value": "NULL",
+			"rdt:valType": "{\"container\":\"list\", \"dimension\":[0]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d4": {
+			"rdt:name": "sif",
+			"rdt:value": "logical(0)",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[0], \"type\":[\"logical\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d5": {
+			"rdt:name": "datetime",
+			"rdt:value": "logical(0)",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[0], \"type\":[\"logical\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d6": {
+			"rdt:name": "id",
+			"rdt:value": "0",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[1], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d7": {
+			"rdt:name": "loadData.R",
+			"rdt:value": "data/7-loadData.R",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[1], \"type\":[\"character\"]}",
+			"rdt:type": "File",
+			"rdt:scope": "undefined",
+			"rdt:fromEnv": false,
+			"rdt:hash": "14d5bdd816e1fadae616705073287b82",
+			"rdt:timestamp": "2018-11-02T20.08.46CDT",
+			"rdt:location": "/Users/Wonsil/Documents/School/Carthage/EnviSciGISThesis/Data Analysis/loadData.R"
+		},
+		"rdt:d8": {
+			"rdt:name": "shapes",
+			"rdt:value": "-69.03658  44.23350Slot \"area\":[1] 5.253596e-05Slot \"hole\":[1] FALSESlot \"ringDi...",
+			"rdt:valType": "{\"container\":\"list\", \"dimension\":[1309101]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d9": {
+			"rdt:name": "sif.var",
+			"rdt:value": "   [1]  0.1802017391  0.8678701520  0.1541497558  1.1353503466  2.1243813038  0....",
+			"rdt:valType": "{\"container\":\"array\", \"dimension\":[10384], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d10": {
+			"rdt:name": "time.ref",
+			"rdt:value": "   [1] 717531356 717531356 717531356 717531357 717531357 717531359 717531359 717...",
+			"rdt:valType": "{\"container\":\"array\", \"dimension\":[10384], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d11": {
+			"rdt:name": "polygons",
+			"rdt:value": "new(\"standardGeneric\", .Data = function (obj) ...",
+			"rdt:valType": "standardGeneric",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d12": {
+			"rdt:name": "sp_poly",
+			"rdt:value": "class\t   : SpatialPolygons ...",
+			"rdt:valType": "SpatialPolygons",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d13": {
+			"rdt:name": "sif.df",
+			"rdt:value": "0.3771454",
+			"rdt:valType": "{\"container\":\"data_frame\", \"dimension\":[1309101,1], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d14": {
+			"rdt:name": "time.df",
+			"rdt:value": "707160735",
+			"rdt:valType": "{\"container\":\"data_frame\", \"dimension\":[1309101,1], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d15": {
+			"rdt:name": "pid",
+			"rdt:value": "\"1\"\t\"2\"\t\"3\"\t\"4\"\t\"5\"\t\"6\"\t\"7\"\t\"8\"\t\"9\"\t\"10\"   \"11\"   \"12...",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[1309101], \"type\":[\"character\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d16": {
+			"rdt:name": "sif.df",
+			"rdt:value": "0.3771454",
+			"rdt:valType": "{\"container\":\"data_frame\", \"dimension\":[1309101,1], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d17": {
+			"rdt:name": "time.df",
+			"rdt:value": "707160735",
+			"rdt:valType": "{\"container\":\"data_frame\", \"dimension\":[1309101,1], \"type\":[\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d18": {
+			"rdt:name": "data.df",
+			"rdt:value": "Row 1 0.3771454 707160735",
+			"rdt:valType": "{\"container\":\"data_frame\", \"dimension\":[1309101,2], \"type\":[\"numeric\",\"numeric\"]}",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d19": {
+			"rdt:name": "sp.poly.df",
+			"rdt:value": "class\t   : SpatialPolygonsDataFrame ...",
+			"rdt:valType": "SpatialPolygonsDataFrame",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d20": {
+			"rdt:name": "Midweast.dbf",
+			"rdt:value": "data/20-Midweast.dbf",
+			"rdt:valType": "{\"container\":\"vector\", \"dimension\":[1], \"type\":[\"character\"]}",
+			"rdt:type": "File",
+			"rdt:scope": "undefined",
+			"rdt:fromEnv": false,
+			"rdt:hash": "47a5e9ffd4ca8f37b0546596766c7d75",
+			"rdt:timestamp": "2018-11-02T22.30.52CDT",
+			"rdt:location": "/Users/Wonsil/Documents/School/Carthage/EnviSciGISThesis/Data Analysis/GIS Files/Midweast.dbf"
+		},
+		"rdt:d21": {
+			"rdt:name": "midweast.area",
+			"rdt:value": "class\t   : SpatialPolygonsDataFrame ...",
+			"rdt:valType": "SpatialPolygonsDataFrame",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d22": {
+			"rdt:name": "sp.poly.df",
+			"rdt:value": "class\t   : SpatialPolygonsDataFrame ...",
+			"rdt:valType": "SpatialPolygonsDataFrame",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+		"rdt:d23": {
+			"rdt:name": "sp.poly.df",
+			"rdt:value": "class\t   : SpatialPolygonsDataFrame ...",
+			"rdt:valType": "SpatialPolygonsDataFrame",
+			"rdt:type": "Data",
+			"rdt:scope": "R_GlobalEnv",
+			"rdt:fromEnv": false,
+			"rdt:hash": "",
+			"rdt:timestamp": "",
+			"rdt:location": ""
+		},
+
+		// environment
+		"rdt:environment": {
+			"rdt:name": "environment",
+			"rdt:architecture": "x86_64",
+			"rdt:operatingSystem": "darwin15.6.0",
+			"rdt:language": "R",
+			"rdt:langVersion": "R version 3.5.0 (2018-04-23)",
+			"rdt:script": "/Users/Wonsil/Documents/School/Carthage/EnviSciGISThesis/Data Analysis/plotData.R",
+			"rdt:scriptTimeStamp": "2018-11-02T10.02.22CDT",
+			"rdt:sourcedScripts": "",
+			"rdt:sourcedScriptTimeStamps": "",
+			"rdt:workingDirectory": "/Users/Wonsil/Documents/School/Carthage/EnviSciGISThesis/Data Analysis",
+			"rdt:ddgDirectory": "/private/var/folders/_0/j81mhmpj35ncnck49jn6hcs40000gn/T/RtmpZCoyts/prov_plotData",
+			"rdt:ddgTimeStamp": "2018-11-02T19.08.43CDT",
+			"rdt:hashAlgorithm": "md5"
+		},
+
+		// library nodes - prov collections
+		"rdt:l1": {
+			"name": "base",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l2": {
+			"name": "datasets",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l3": {
+			"name": "ggplot2",
+			"version": "3.1.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l4": {
+			"name": "graphics",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l5": {
+			"name": "grDevices",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l6": {
+			"name": "maptools",
+			"version": "0.9-3",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l7": {
+			"name": "methods",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l8": {
+			"name": "raster",
+			"version": "2.6-7",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l9": {
+			"name": "rdt",
+			"version": "3.0.2",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l10": {
+			"name": "rgdal",
+			"version": "1.3-4",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l11": {
+			"name": "rgeos",
+			"version": "0.3-28",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l12": {
+			"name": "rhdf5",
+			"version": "2.24.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l13": {
+			"name": "sp",
+			"version": "1.3-1",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l14": {
+			"name": "stats",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+		"rdt:l15": {
+			"name": "utils",
+			"version": "3.5.0",
+			"prov:type": {
+				"$": "prov:Collection",
+				"type": "xsd:QName"
+			}
+		},
+
+		// function nodes
+		"rdt:f1": {
+			"name": "SpatialPolygons"
+		},
+		"rdt:f2": {
+			"name": "slot"
+		},
+		"rdt:f3": {
+			"name": "SpatialPolygonsDataFrame"
+		},
+		"rdt:f4": {
+			"name": "readOGR"
+		},
+		"rdt:f5": {
+			"name": "proj4string"
+		},
+		"rdt:f6": {
+			"name": "spTransform"
+		},
+		"rdt:f7": {
+			"name": "CRS"
+		}
+	},
+
+	"wasInformedBy" : {
+		// procedure-to-procedure edges
+		"rdt:pp1": {
+			"prov:informant": "rdt:p1",
+			"prov:informed": "rdt:p2"
+		},
+		"rdt:pp2": {
+			"prov:informant": "rdt:p2",
+			"prov:informed": "rdt:p3"
+		},
+		"rdt:pp3": {
+			"prov:informant": "rdt:p3",
+			"prov:informed": "rdt:p4"
+		},
+		"rdt:pp4": {
+			"prov:informant": "rdt:p4",
+			"prov:informed": "rdt:p5"
+		},
+		"rdt:pp5": {
+			"prov:informant": "rdt:p5",
+			"prov:informed": "rdt:p6"
+		},
+		"rdt:pp6": {
+			"prov:informant": "rdt:p6",
+			"prov:informed": "rdt:p7"
+		},
+		"rdt:pp7": {
+			"prov:informant": "rdt:p7",
+			"prov:informed": "rdt:p8"
+		},
+		"rdt:pp8": {
+			"prov:informant": "rdt:p8",
+			"prov:informed": "rdt:p9"
+		},
+		"rdt:pp9": {
+			"prov:informant": "rdt:p9",
+			"prov:informed": "rdt:p10"
+		},
+		"rdt:pp10": {
+			"prov:informant": "rdt:p10",
+			"prov:informed": "rdt:p11"
+		},
+		"rdt:pp11": {
+			"prov:informant": "rdt:p11",
+			"prov:informed": "rdt:p12"
+		},
+		"rdt:pp12": {
+			"prov:informant": "rdt:p12",
+			"prov:informed": "rdt:p13"
+		},
+		"rdt:pp13": {
+			"prov:informant": "rdt:p13",
+			"prov:informed": "rdt:p14"
+		},
+		"rdt:pp14": {
+			"prov:informant": "rdt:p14",
+			"prov:informed": "rdt:p15"
+		},
+		"rdt:pp15": {
+			"prov:informant": "rdt:p15",
+			"prov:informed": "rdt:p16"
+		},
+		"rdt:pp16": {
+			"prov:informant": "rdt:p16",
+			"prov:informed": "rdt:p17"
+		},
+		"rdt:pp17": {
+			"prov:informant": "rdt:p17",
+			"prov:informed": "rdt:p18"
+		},
+		"rdt:pp18": {
+			"prov:informant": "rdt:p18",
+			"prov:informed": "rdt:p19"
+		},
+		"rdt:pp19": {
+			"prov:informant": "rdt:p19",
+			"prov:informed": "rdt:p20"
+		},
+		"rdt:pp20": {
+			"prov:informant": "rdt:p20",
+			"prov:informed": "rdt:p21"
+		},
+		"rdt:pp21": {
+			"prov:informant": "rdt:p21",
+			"prov:informed": "rdt:p22"
+		},
+		"rdt:pp22": {
+			"prov:informant": "rdt:p22",
+			"prov:informed": "rdt:p23"
+		},
+		"rdt:pp23": {
+			"prov:informant": "rdt:p23",
+			"prov:informed": "rdt:p24"
+		},
+		"rdt:pp24": {
+			"prov:informant": "rdt:p24",
+			"prov:informed": "rdt:p25"
+		},
+		"rdt:pp25": {
+			"prov:informant": "rdt:p25",
+			"prov:informed": "rdt:p26"
+		},
+		"rdt:pp26": {
+			"prov:informant": "rdt:p26",
+			"prov:informed": "rdt:p27"
+		},
+		"rdt:pp27": {
+			"prov:informant": "rdt:p27",
+			"prov:informed": "rdt:p28"
+		},
+		"rdt:pp28": {
+			"prov:informant": "rdt:p28",
+			"prov:informed": "rdt:p29"
+		},
+		"rdt:pp29": {
+			"prov:informant": "rdt:p29",
+			"prov:informed": "rdt:p30"
+		}
+	},
+
+	"wasGeneratedBy" : {
+		// procedure-to-data edges
+		"rdt:pd1": {
+			"prov:activity": "rdt:p8",
+			"prov:entity": "rdt:d1"
+		},
+		"rdt:pd2": {
+			"prov:activity": "rdt:p9",
+			"prov:entity": "rdt:d2"
+		},
+		"rdt:pd3": {
+			"prov:activity": "rdt:p10",
+			"prov:entity": "rdt:d3"
+		},
+		"rdt:pd4": {
+			"prov:activity": "rdt:p11",
+			"prov:entity": "rdt:d4"
+		},
+		"rdt:pd5": {
+			"prov:activity": "rdt:p12",
+			"prov:entity": "rdt:d5"
+		},
+		"rdt:pd6": {
+			"prov:activity": "rdt:p13",
+			"prov:entity": "rdt:d6"
+		},
+		"rdt:pd7": {
+			"prov:activity": "rdt:p15",
+			"prov:entity": "rdt:d8"
+		},
+		"rdt:pd8": {
+			"prov:activity": "rdt:p15",
+			"prov:entity": "rdt:d9"
+		},
+		"rdt:pd9": {
+			"prov:activity": "rdt:p15",
+			"prov:entity": "rdt:d10"
+		},
+		"rdt:pd10": {
+			"prov:activity": "rdt:p15",
+			"prov:entity": "rdt:d11"
+		},
+		"rdt:pd11": {
+			"prov:activity": "rdt:p17",
+			"prov:entity": "rdt:d12"
+		},
+		"rdt:pd12": {
+			"prov:activity": "rdt:p19",
+			"prov:entity": "rdt:d13"
+		},
+		"rdt:pd13": {
+			"prov:activity": "rdt:p20",
+			"prov:entity": "rdt:d14"
+		},
+		"rdt:pd14": {
+			"prov:activity": "rdt:p21",
+			"prov:entity": "rdt:d15"
+		},
+		"rdt:pd15": {
+			"prov:activity": "rdt:p22",
+			"prov:entity": "rdt:d16"
+		},
+		"rdt:pd16": {
+			"prov:activity": "rdt:p23",
+			"prov:entity": "rdt:d17"
+		},
+		"rdt:pd17": {
+			"prov:activity": "rdt:p24",
+			"prov:entity": "rdt:d18"
+		},
+		"rdt:pd18": {
+			"prov:activity": "rdt:p25",
+			"prov:entity": "rdt:d19"
+		},
+		"rdt:pd19": {
+			"prov:activity": "rdt:p27",
+			"prov:entity": "rdt:d21"
+		},
+		"rdt:pd20": {
+			"prov:activity": "rdt:p28",
+			"prov:entity": "rdt:d22"
+		},
+		"rdt:pd21": {
+			"prov:activity": "rdt:p29",
+			"prov:entity": "rdt:d23"
+		}
+	},
+
+	"used" : {
+		// data-to-procedure edges
+		"rdt:dp1": {
+			"prov:entity": "rdt:d1",
+			"prov:activity": "rdt:p9"
+		},
+		"rdt:dp2": {
+			"prov:entity": "rdt:d2",
+			"prov:activity": "rdt:p14"
+		},
+		"rdt:dp3": {
+			"prov:entity": "rdt:d2",
+			"prov:activity": "rdt:p15"
+		},
+		"rdt:dp4": {
+			"prov:entity": "rdt:d7",
+			"prov:activity": "rdt:p15"
+		},
+		"rdt:dp5": {
+			"prov:entity": "rdt:d8",
+			"prov:activity": "rdt:p17"
+		},
+		"rdt:dp6": {
+			"prov:entity": "rdt:d4",
+			"prov:activity": "rdt:p19"
+		},
+		"rdt:dp7": {
+			"prov:entity": "rdt:d5",
+			"prov:activity": "rdt:p20"
+		},
+		"rdt:dp8": {
+			"prov:entity": "rdt:d12",
+			"prov:activity": "rdt:p21"
+		},
+		"rdt:dp9": {
+			"prov:entity": "rdt:d13",
+			"prov:activity": "rdt:p22"
+		},
+		"rdt:dp10": {
+			"prov:entity": "rdt:d15",
+			"prov:activity": "rdt:p22"
+		},
+		"rdt:dp11": {
+			"prov:entity": "rdt:d14",
+			"prov:activity": "rdt:p23"
+		},
+		"rdt:dp12": {
+			"prov:entity": "rdt:d15",
+			"prov:activity": "rdt:p23"
+		},
+		"rdt:dp13": {
+			"prov:entity": "rdt:d16",
+			"prov:activity": "rdt:p24"
+		},
+		"rdt:dp14": {
+			"prov:entity": "rdt:d17",
+			"prov:activity": "rdt:p24"
+		},
+		"rdt:dp15": {
+			"prov:entity": "rdt:d12",
+			"prov:activity": "rdt:p25"
+		},
+		"rdt:dp16": {
+			"prov:entity": "rdt:d18",
+			"prov:activity": "rdt:p25"
+		},
+		"rdt:dp17": {
+			"prov:entity": "rdt:d20",
+			"prov:activity": "rdt:p27"
+		},
+		"rdt:dp18": {
+			"prov:entity": "rdt:d19",
+			"prov:activity": "rdt:p28"
+		},
+		"rdt:dp19": {
+			"prov:entity": "rdt:d22",
+			"prov:activity": "rdt:p29"
+		},
+		"rdt:dp20": {
+			"prov:entity": "rdt:d21",
+			"prov:activity": "rdt:p29"
+		},
+
+		// function-to-procedure edges
+		"rdt:fp1": {
+			"prov:entity": "rdt:f1",
+			"prov:activity": "rdt:p17"
+		},
+		"rdt:fp2": {
+			"prov:entity": "rdt:f2",
+			"prov:activity": "rdt:p21"
+		},
+		"rdt:fp3": {
+			"prov:entity": "rdt:f3",
+			"prov:activity": "rdt:p25"
+		},
+		"rdt:fp4": {
+			"prov:entity": "rdt:f4",
+			"prov:activity": "rdt:p27"
+		},
+		"rdt:fp5": {
+			"prov:entity": "rdt:f5",
+			"prov:activity": "rdt:p28"
+		},
+		"rdt:fp6": {
+			"prov:entity": "rdt:f6",
+			"prov:activity": "rdt:p29"
+		},
+		"rdt:fp7": {
+			"prov:entity": "rdt:f7",
+			"prov:activity": "rdt:p29"
+		},
+		"rdt:fp8": {
+			"prov:entity": "rdt:f5",
+			"prov:activity": "rdt:p29"
+		}
+	},
+
+	"hadMember" : {
+		// groups function nodes with their library nodes
+		"rdt:m1": {
+			"prov:collection": "rdt:l7",
+			"prov:entity": "rdt:f2"
+		},
+		"rdt:m2": {
+			"prov:collection": "rdt:l10",
+			"prov:entity": "rdt:f4"
+		},
+		"rdt:m3": {
+			"prov:collection": "rdt:l13",
+			"prov:entity": "rdt:f1"
+		},
+		"rdt:m4": {
+			"prov:collection": "rdt:l13",
+			"prov:entity": "rdt:f3"
+		},
+		"rdt:m5": {
+			"prov:collection": "rdt:l13",
+			"prov:entity": "rdt:f5"
+		},
+		"rdt:m6": {
+			"prov:collection": "rdt:l13",
+			"prov:entity": "rdt:f6"
+		},
+		"rdt:m7": {
+			"prov:collection": "rdt:l13",
+			"prov:entity": "rdt:f7"
+		}
+	}
+}

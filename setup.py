@@ -13,7 +13,8 @@ setup(name='provdebug',
     install_requires=[
         'pandas',
         'networkx',
-        'numpy'      
+        'numpy',
+        'natsort'      
     ],
     entry_points = {
      'console_scripts': [
