@@ -2,6 +2,8 @@
 
 A langugage - agnostic version of [provDebugR.](https://github.com/ProvTools/provDebugR/wiki)
 
+For instructions on how to use the debugger visit the repository's [wiki](https://github.com/jwons/MultilingualProvenanceDebugger/wiki).
+
 This debugger uses provenance information to reconstruct past-executions and allow users to explore them at their will. This tool will work with any program so long as it has provenance collected that follows [this format](https://github.com/End-to-end-provenance/ExtendedProvJson).
 
 ## Current Features
