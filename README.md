@@ -8,6 +8,9 @@ This debugger uses provenance information to reconstruct past-executions and all
 
 ### Debugging Features
 
+**Command-Line Debugging:**
+This functions similarly to standard command-line debuggers. A user will be able to step through a past execution as if it was currently being debugged. However, this will also have the added benefit of letting the user step backwards or forwards. Additionally, they can call some of the extra features the debugger has like checking a variable's lineage. 
+
 **Lineage:**
 A function that finds connections that variables have with each other and will return a variable's forward or backward connections.
 
@@ -27,11 +30,6 @@ A python module exists within this package capable of parsing the prov.json file
 
 **Graph Conversion**
 A python module exists within this package capable of using the information from the parsing module to create a network data structure using the networkx package. This structure is then used by the debugging class to find lineage of various provenance nodes.
-
-## Currently in Progress
-
-**Command-Line Debugging:**
-This will function similarly to standard command-line debuggers. A user will be able to step through a past execution as if it was currently being debugged. However, this will also have the added benefit of letting the user step backwards or forwards. 
 
 ## Future Features
 
