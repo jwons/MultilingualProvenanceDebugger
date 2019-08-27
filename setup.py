@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='provdebug',
-    version='0.3',
+    version='0.4',
     description='Multilingual Provenance Debugger',
     url='http://github.com/jwons/MultilingualProvenanceDebugger', 
     author='Joseph Wonsil',
