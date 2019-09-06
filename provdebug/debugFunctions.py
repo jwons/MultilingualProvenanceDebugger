@@ -224,12 +224,8 @@ class ProvDebug:
         posArgs = []
 
         # Flattens the arguments in case a list of variables is passed.
-        # thanks Alex Martelli and Jack Moody on Stack Overflow for 
-        # the list comprehension method of doing this
-        #TODO nevermind the thanks, I don't want it. It makes strings into chars
         args = list(args)
         flat_list = self.flatten(args)
-        #flat_list = [item for sublist in args for item in sublist]
 
         # Don't process variables that don't exist in the provenance
         for arg in flat_list:
@@ -366,7 +362,6 @@ class ProvDebug:
             for node in nodes:
                 referencedEntity = self._dataProcEdges[self._dataProcEdges["activity"] == node]["entity"].values
 
-                #TODO replace with None?
                 referencedNode = 'nan'      
 
                 if (len(referencedEntity) > 0):

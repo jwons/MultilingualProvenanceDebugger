@@ -63,8 +63,6 @@ class ProvBrowser:
             elif(row["type"] == "Finish"):
                 self._scopeStack[self._currentScope][-1]["scopeChange"] = lastScope[-1]
                 self._currentScope = lastScope[-1]
-                #TODO This may be optional
-                #self._scopeStack[self._currentScope].append({"row":row, "scopeChange":lastScope[-1]})
                 del lastScope[-1]
             else:
                 self._scopeStack[self._currentScope].append({"row":row, "scopeChange":self._currentScope})  
