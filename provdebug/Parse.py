@@ -120,3 +120,30 @@ class Parser:
 
     def getFuncProc(self):
         return(self.getProvInfo("funcProcEdges"))
+
+
+    # This function returns the files that were read in to the script.
+    # It does this by checking the data nodes of the type "File",
+    # with data to procedure edges. 
+    def getInputFiles(self):
+        dataNodes = self.getDataNodes()
+
+        dataNodes = dataNodes[dataNodes.type.isin(["File"])]
+        if(len(dataNodes.index) != 0):
+            dataProc = list(self.getDataProc()["entity"])
+            dataNodes = dataNodes[dataNodes.index.isin(dataProc)]
+
+        return(dataNodes[["name", "location", "timestamp"]])
+    
+    # This function returns the files that were read in to the script.
+    # It does this by checking the data nodes of the type "File",
+    # with procedure to data edges. 
+    def getOutputFiles(self):
+        dataNodes = self.getDataNodes()
+
+        dataNodes = dataNodes[dataNodes.type.isin(["File"])]
+        if(len(dataNodes.index) != 0):
+            procData = list(self.getProcData()["entity"])
+            dataNodes = dataNodes[dataNodes.index.isin(procData)]
+
+        return(dataNodes[["name", "location", "timestamp"]])
