@@ -121,6 +121,9 @@ class Parser:
     def getFuncProc(self):
         return(self.getProvInfo("funcProcEdges"))
 
+    def getFuncLib(self):
+        return(self.getProvInfo("funcLibEdges"))
+
 
     # This function returns the files that were read in to the script.
     # It does this by checking the data nodes of the type "File",
