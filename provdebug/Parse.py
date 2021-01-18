@@ -13,23 +13,27 @@ class Parser:
 
     # Constructor takes a filepath to a provenance file and reads in 
     # the information into memory
-    def __init__(self, filepath):
+    def __init__(self, inputProv, isFile = True):
         prov = ""
         
         # before the json can be converted into a Pythonic structure
         # it has to be 'cleaned.' prefixes and comments are removed
-        with open(filepath) as provJson:
-            provLines = []
-            for line in provJson:
-                if("//" not in line):
-                    provLines.append(line)
+        provLines = []
 
-            prov = ''.join(provLines)
+        if(isFile):
+            with open(inputProv) as provJson:
+                provLines = provJson.readlines()
+        else:
+            provLines = inputProv.split("\n")
 
-            prov = prov.replace("rdt:", "")
-            prov = prov.replace("prov:", "")
+        for line in inputProv:
+            if("//" in line):
+                provLines.remove(line)
 
-            prov = json.loads(prov)
+        prov = ''.join(provLines)
+        prov = prov.replace("rdt:", "")
+        prov = prov.replace("prov:", "")
+        prov = json.loads(prov)
 
         
 
