@@ -3,7 +3,7 @@
 import textwrap
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-import provdebug as pvd 
+import provdebug as prov
 import readline
 
 def run():
@@ -46,7 +46,7 @@ def run():
     args = parser.parse_args() 
 
 
-    browser = pvd.ProvBrowser(args.file)
+    browser = prov.Browser(args.file)
     
     print("Welcome to the Multilingual Provenance Debugger, type help for more information")
     browser.stepIn()

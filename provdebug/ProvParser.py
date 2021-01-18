@@ -26,11 +26,11 @@ class Parser:
         else:
             provLines = inputProv.split("\n")
 
-        for line in inputProv:
+        for line in provLines:
             if("//" in line):
                 provLines.remove(line)
 
-        prov = ''.join(provLines)
+        prov = "".join(provLines)
         prov = prov.replace("rdt:", "")
         prov = prov.replace("prov:", "")
         prov = json.loads(prov)

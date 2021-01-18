@@ -1,0 +1,4 @@
+requests==2.25.1
+networkx==2.5
+pandas==1.1.5
+natsort==7.1.0

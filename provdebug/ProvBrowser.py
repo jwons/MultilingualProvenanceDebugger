@@ -1,13 +1,13 @@
 import os
 import natsort
-from .debugFunctions import ProvDebug
+from .ProvExplorer import Explorer
 
 # This class uses prov.json file to reconstruct a past execution 
 # and can walk forwards and backwards through it. This class is not 
 # intended to be used as the direct interface to a user. Rather,
 # an interface can be built on top of this class.
 
-class ProvBrowser:
+class Browser:
 
     # This constructor takes a prov.json filename as an argument 
     # to initialize the debugger object which will parse the json

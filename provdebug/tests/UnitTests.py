@@ -64,7 +64,7 @@ class TestProvGrapher(unittest.TestCase):
 class TestProvDebugger(unittest.TestCase):
 
     def setUp(self):
-        self.pvdebug = pvd.ProvDebug("provdebug/tests/test.json")
+        self.pvdebug = pvd.Explorer("provdebug/tests/test.json")
     
     def testTypeCheckNoArgs(self):
         returnCode, returnValue = self.pvdebug.typeCheck()

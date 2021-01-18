@@ -5,10 +5,10 @@ import requests
 import json
 import sys
 import re
-from .Parse import Parser
-from .Graph import Grapher
+from .ProvParser import Parser
+from .ProvGrapher import Grapher
 
-class ProvDebug:
+class Explorer:
 
     # This class uses the information created from parsing provenance
     def __init__(self, filepath):

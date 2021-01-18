@@ -7,14 +7,15 @@ setup(name='provdebug',
     description='Multilingual Provenance Debugger',
     url='http://github.com/jwons/MultilingualProvenanceDebugger', 
     author='Joseph Wonsil',
-    author_email='jwonsil@carthage.edu',
+    author_email='jwonsil@cs.ubc.ca',
     license='GPL 3.0',
     packages=['provdebug'],
     install_requires=[
         'pandas',
         'networkx',
         'numpy',
-        'natsort'      
+        'natsort',
+        'requests'      
     ],
     entry_points = {
      'console_scripts': [
