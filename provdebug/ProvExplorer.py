@@ -243,7 +243,7 @@ class Explorer:
         else:
             # Process the lineage for each variable they passed and then return it
             for result in posArgs:
-                retVal.append(self._grabLineage(result, forward))
+                retVal.append(self._grabLineage(result, forward)[["scriptNum", "startLine", "name"]])
 
         return(returnCode, retVal)
 
@@ -283,7 +283,7 @@ class Explorer:
 
         # Continually append rows for each procedure node returned from the graph search
         for match in matches:
-            retVal = pd.concat([retVal, procNodes.loc[procNodes["label"] == match, ["scriptNum", "startLine", "name"]]])
+            retVal = pd.concat([retVal, procNodes.loc[procNodes["label"] == match, ["scriptNum", "startLine", "name", "label"]]])
 
         # Reindex rows for clarity 
         retVal.index = range(len(retVal.index))
@@ -510,3 +510,71 @@ class Explorer:
             nodes = []
 
         return(nodes)
+
+    # This function will provide the procedure node where a data node was generated. 
+    # Requires a data node label and returns a single dataframe row from procedure nodes
+    def getProcedureFromData(self, data_node):
+        procNodes = self.prov.getProcNodes()
+        procToData = self.prov.getProcData()
+        procNodeLabel = procToData.loc[procToData["entity"] == data_node]["activity"].values[0]
+        procNode = procNodes.loc[procNodes["label"] == procNodeLabel]
+        return(procNode)
+
+    # This function will provide the procedure node where a data node was generated. 
+    # Requires a data node label and returns a single dataframe row from procedure nodes
+    def getDataFromProcedure(self, proc_node):
+        dataNodes = self.prov.getDataNodes()
+        procToData = self.prov.getProcData()
+        dataNodeLabel = procToData.loc[procToData["activity"] == proc_node]["entity"].values[0]
+        dataNode = dataNodes.loc[dataNodes["label"] == dataNodeLabel]
+        return(dataNode)
+
+    def getVarLifeCycles(self, var_name):
+        # Need all data and procedure nodes to find life cycles
+        dataNodes = self.prov.getDataNodes()
+        procNodes = self.prov.getProcNodes()
+
+        # Get only variables that have the name as the passed variable
+        varNodes = dataNodes.loc[dataNodes["name"] == var_name]
+
+        # we use the labels to match with the correct rows in dataNodes dataframe
+        varLabels = varNodes["label"].to_numpy()
+
+        # Starting from the first node, we will track lineage forward in a script
+        initialLabel = varNodes.iloc[0]["label"]
+
+        # This is the final return value, a list of dataframes. The length of this
+        # list is the number of lifeCycles for a variable
+        lifeCycles = []
+
+        # This loop will keep executing so long as there are still life cycles to be found
+        # Each iteration will subset out the life cycles discovered, when there are no more
+        # labels, that means all cycles have been found.
+        while(len(varLabels) > 0):
+            # collect the forward lineage of all related procedure nodes form this particular data node
+            lineageProcs = self.getNodeLifeCycle(initialLabel, procNodes)
+
+            # Collect all the data nodes that were generated from proc nodes in this particular data node's forward lineage
+            dataLineage = np.concatenate([self.getDataFromProcedure(node)["label"].to_numpy() for node in lineageProcs])
+
+            # Mask is used to subset out the life cycle, and then remove life cycle by subsetting the negation of the mask
+            cycle_mask = np.isin(varLabels, dataLineage)
+            lifeCycles.append(dataNodes[np.isin(dataNodes["label"].to_numpy(),  varLabels[cycle_mask])])
+            varLabels = varLabels[~cycle_mask]
+
+            # Reset the initialLabel. If the length is 0, just break, as grabbing initial value will throw error
+            if(len(varLabels) > 0):
+                initialLabel = varLabels[0]
+            else:
+                break
+            
+        return(lifeCycles)
+
+
+    # This function takes a data node, finds the procedure node that generated it, and then uses that proc node to find a
+    # forward lineage of the data node that was passed in as a label. Returns an np array of procedure nodes.
+    def getNodeLifeCycle(self, initialLabel, procNodes):
+
+        initialNode = self.getProcedureFromData(initialLabel)["label"].to_numpy()[0]
+        lineageProcs = [initialNode] + list(self._processLabel(initialLabel, procNodes, forward=True)["label"].to_numpy())
+        return(lineageProcs)
