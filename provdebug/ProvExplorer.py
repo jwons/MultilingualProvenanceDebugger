@@ -16,6 +16,15 @@ class Explorer:
         self.graph = Grapher(self.prov)
         self._procDataEdges = self.prov.getProcData()
 
+
+    # This function is a post-mortem type checker. Pass it a single variable name, or multiple variables seperated as commas 
+    # Note this means to type check multiple variables, call like this typeCheck("foo", "bar") not typeCheck(["foo", "bar"])
+    # TODO: for multiple, maybe we really ought to accept a list...
+    # This function will return a tuple, the first entry is a return code, where 0 is success and 1 is failure. When successful, 
+    # the second element will be a dictionary, where the key is the variable name and the value is a dataframe of that variables types
+    # if onlyBool is true, it will check whether or not a variable had the same type and the value will instead be a boolean. True if it kept
+    # its type, false it changed types. If the function failed for some reason, the second tuple element will be a list of possible variable 
+    # names that it can type check.
     def typeCheck(self, *args, onlyBool = False):
 
         # This value indicates whether or not the function was able to 
@@ -461,7 +470,8 @@ class Explorer:
 
     # This function gathers all variables used in a procedure 
     # based on the node. Should always be passed a proc node.
-    # Used by fromLine and getVarsFromCurrentLocation in the ProvBrowser
+    # returns a dataframe of data nodes
+    # Used by fromLine and getVarsFromCurrentLocation in the Browser
     def _varsByNode(self, node):
 
         entity = self._procDataEdges[self._procDataEdges["activity"] == node]["entity"]
