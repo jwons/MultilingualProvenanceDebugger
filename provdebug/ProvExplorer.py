@@ -530,8 +530,8 @@ class Explorer:
         procNode = procNodes.loc[procNodes["label"] == procNodeLabel]
         return(procNode)
 
-    # This function will provide the procedure node where a data node was generated. 
-    # Requires a data node label and returns a single dataframe row from procedure nodes
+    # This function will provide the data node a proc node generated. 
+    # Requires a proc node label and returns a single dataframe row from data nodes
     def getDataFromProcedure(self, proc_node):
         dataNodes = self.prov.getDataNodes()
         procToData = self.prov.getProcData()
@@ -539,6 +539,19 @@ class Explorer:
         dataNode = dataNodes.loc[dataNodes["label"] == dataNodeLabel]
         return(dataNode)
 
+    # This function takes a variable name and returns that variables life cycles. 
+    # Life cycles in this context are groups of instances of a single variable in 
+    # the code where the variable was used to determine its own value. 
+    # For example, the following code has two life cycles.
+    # foo <- 5
+    # foo <- 5 + foo
+    # foo <- 10 * foo
+    # foo <- "hello"
+    # foo <- c(foo, "world")
+    # the first life cycle is the first 3 instances, and the second life cycle is the last two lines
+    # This function will return a list of dataframes. Each element in the list is a single life cycle, 
+    # so the length of the list is the number of life cycles. Each dataframe is simple a subset of the 
+    # entire data node data frame, except only the rows corresponding to that particular life cycle.
     def getVarLifeCycles(self, var_name):
         # Need all data and procedure nodes to find life cycles
         dataNodes = self.prov.getDataNodes()
