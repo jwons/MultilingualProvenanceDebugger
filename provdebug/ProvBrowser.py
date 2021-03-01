@@ -13,7 +13,7 @@ class Browser:
     # to initialize the debugger object which will parse the json
     # using the Parser object
     def __init__(self, filename):
-        self.debugger = ProvDebug(filename)
+        self.debugger = Explorer(filename) 
 
         # The debugger object has a parsing object in it that can be
         # used to query the environment node for the script name
