@@ -3,6 +3,7 @@
 import textwrap
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
+from .DebugRecord import DebugRecord
 import provdebug as prov
 import readline
 
@@ -10,9 +11,10 @@ import readline
 # means we'd have to pass it around everywhere.
 shouldRecord = False
 
-def record_user_choice(choice, record):
+def record_user_choice(choice, records, info):
     if shouldRecord:
-        record.append(choice)
+        record = DebugRecord(choice, info)
+        records.append(record)
 
 def run():
     # Needed to treat shouldRecord as a global value, and not a local one
@@ -63,10 +65,11 @@ def run():
     print("Welcome to the Multilingual Provenance Debugger, type help for more information")
     browser.stepIn()
     print(browser.getCurrentNodeInfo())
+    
+    try: readline.read_history_file()
+    except: pass
 
     while(True):
-        try: readline.read_history_file()
-        except: pass
         userInput = input("> ")
         try: readline.write_history_file()
         except: pass
@@ -80,27 +83,27 @@ def run():
             print(helpText)
             continue
         elif(userFlag == "n" or userFlag == "next"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions, browser.getCurrentNodeInfo())
             browser.nextNode()
         elif(userFlag == "b" or userFlag == "back"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions, browser.getCurrentNodeInfo())
             browser.previousNode()
         elif(userFlag == "s" or userFlag == "step"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
             browser.stepIn()
         elif(userFlag == "o" or userFlag == "out"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
             browser.stepOut()
         elif(userFlag == "v" or userFlag == "vars"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
             print(browser.getVarNamesFromCurrentLocation())
             continue
         elif(userFlag == "i" or userFlag == "info"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
             print(browser.getCurrentNodeInfo())
             continue
         elif(userFlag == "p" or userFlag == "print"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
             vars = browser.getVarsFromCurrentLocation()
             varNames = userChoices[1:len(userChoices)]
             if(len(varNames) == 0):
@@ -124,7 +127,7 @@ def run():
                 print("Please specify a variable or variables to find the lineage for.")
             continue
         elif(userFlag == "so" or userFlag == "search"):
-            record_user_choice(userFlag, userActions)
+            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
             code, result = browser.debugger.errorSearch()
             for number, title in enumerate(list(result["title"].values)):
                 print(number + 1, title)
@@ -143,7 +146,8 @@ def run():
                 browser.debugger.openStackSearch(result, choice)
             continue
         elif(userFlag == "q" or userFlag == "quit"):
-            print(f"User action history: {userActions}")
+            for record in userActions:
+                record.prettyPrint()
             break
         elif userFlag == "r" or userFlag == "record":
             shouldRecord = True
