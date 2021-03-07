@@ -8,6 +8,7 @@ import provdebug as prov
 import readline
 import json
 import random
+import sys
 
 # I really don't like global variables/state, but having this as a local variable in run()
 # means we'd have to pass it around everywhere.
@@ -62,13 +63,21 @@ def run():
     parser.add_argument("-f", "--file", dest="file", required=False,
                         help="Prov.Json file to analyze")
 
-    parser.add_argument("-replay", "--replay-file", dest="file", required=False,
+    parser.add_argument("-r", "--replay", dest="file", required=False,
                         help="Prov.Replay file to analyze")
+    
+    # TODO: execute 2 different paths depending on what we run the debugger with
+    # If args contains the string .replay 
 
     #TO DEBUG
-    #args = parser.parse_args(rest) 
+    #args = parser.parse_args(rest)
     
     args = parser.parse_args()
+    provdb_command = sys.argv[1]
+    print(args.file)
+    if provdb_command == "-r":
+        prov.Replayer(args.file)
+        # TODO: execute path in ProvReplay
 
     # record of user actions
     userActions = []

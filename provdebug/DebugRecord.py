@@ -16,5 +16,5 @@ class DebugRecord:
         return asDict
 
     @staticmethod
-    def fromFile(filepath):
-        pass
+    def fromDict(contentDict):
+        return DebugRecord(contentDict["userAction"], contentDict["programInfo"])
