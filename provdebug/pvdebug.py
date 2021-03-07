@@ -6,15 +6,25 @@ from argparse import RawDescriptionHelpFormatter
 from .DebugRecord import DebugRecord
 import provdebug as prov
 import readline
+import json
+import random
 
 # I really don't like global variables/state, but having this as a local variable in run()
 # means we'd have to pass it around everywhere.
 shouldRecord = False
 
-def record_user_choice(choice, records, info):
+def recordUserActions(choice, records, info):
     if shouldRecord:
         record = DebugRecord(choice, info)
         records.append(record)
+
+def saveRecords(records):
+    recordDicts = [record.writeDict() for record in records]
+    encodedRecords = json.dumps(recordDicts)
+    # TODO: think of better way to name files
+    f = open(f"./debugging-trace-{random.randint(0, 9)}.replay", "w")
+    f.write(encodedRecords)
+    f.close()
 
 def run():
     # Needed to treat shouldRecord as a global value, and not a local one
@@ -49,8 +59,11 @@ def run():
         try: readline.write_history_file()
         except: pass
     '''
-    parser.add_argument("-f", "--file", dest="file", required=True,
+    parser.add_argument("-f", "--file", dest="file", required=False,
                         help="Prov.Json file to analyze")
+
+    parser.add_argument("-replay", "--replay-file", dest="file", required=False,
+                        help="Prov.Replay file to analyze")
 
     #TO DEBUG
     #args = parser.parse_args(rest) 
@@ -79,31 +92,32 @@ def run():
         userFlag = userChoices[0]
 
         if(userFlag == "help"):
-            record_user_choice(userFlag, userActions)
+            recordUserChoice(userFlag, userActions)
             print(helpText)
             continue
         elif(userFlag == "n" or userFlag == "next"):
-            record_user_choice(userFlag, userActions, browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
             browser.nextNode()
         elif(userFlag == "b" or userFlag == "back"):
-            record_user_choice(userFlag, userActions, browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
+            
             browser.previousNode()
         elif(userFlag == "s" or userFlag == "step"):
-            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
             browser.stepIn()
         elif(userFlag == "o" or userFlag == "out"):
-            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
             browser.stepOut()
         elif(userFlag == "v" or userFlag == "vars"):
-            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
             print(browser.getVarNamesFromCurrentLocation())
             continue
         elif(userFlag == "i" or userFlag == "info"):
-            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
             print(browser.getCurrentNodeInfo())
             continue
         elif(userFlag == "p" or userFlag == "print"):
-            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
             vars = browser.getVarsFromCurrentLocation()
             varNames = userChoices[1:len(userChoices)]
             if(len(varNames) == 0):
@@ -127,7 +141,7 @@ def run():
                 print("Please specify a variable or variables to find the lineage for.")
             continue
         elif(userFlag == "so" or userFlag == "search"):
-            record_user_choice(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
             code, result = browser.debugger.errorSearch()
             for number, title in enumerate(list(result["title"].values)):
                 print(number + 1, title)
@@ -146,13 +160,24 @@ def run():
                 browser.debugger.openStackSearch(result, choice)
             continue
         elif(userFlag == "q" or userFlag == "quit"):
+            saveRecords(userActions)
             for record in userActions:
                 record.prettyPrint()
             break
         elif userFlag == "r" or userFlag == "record":
-            shouldRecord = True
+            if shouldRecord:
+                print("This debugging session is already being recorded\n")
+            else:
+                print("This debugging session is now being recorded\n")
+                shouldRecord = True
         elif userFlag == "sr" or userFlag == "stop_record":
-            shouldRecord = False
+            if not shouldRecord:
+                print("There is no debugging session being recorded")
+            else:
+                print("This debugging session has stopped\n")
+                saveRecords(userActions)
+                userActions = []
+                shouldRecord = False
 
         print(browser.getCurrentNodeInfo())
 

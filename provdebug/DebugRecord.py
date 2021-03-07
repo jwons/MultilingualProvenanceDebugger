@@ -8,3 +8,13 @@ class DebugRecord:
         print(f"Developer action: {self._userChoice}")
         print("Program info:\n")
         print(self._programInfo)
+
+    def writeDict(self):
+        asDict = {}
+        asDict["userAction"] = self._userChoice
+        asDict["programInfo"] = self._programInfo
+        return asDict
+
+    @staticmethod
+    def fromFile(filepath):
+        pass
