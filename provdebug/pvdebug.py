@@ -43,6 +43,9 @@ def run():
             - l or lineage [variables]: prints the lineage of each space-separated variable passed to it 
             - p or print [variables]: prints the values of each space-separated variable passed to it
             - so or search: searches a script's error message on Stack Overflow
+            - r or record: begins recording the user's sequence of steps and associated program information as a trace
+            - sr or stop_record: stops the debugging recording
+            - a or annotate: allows the user to write and add an annotation to the most recent debugging step recorded
             - q or quit: quit the debugger
         ''')
 
