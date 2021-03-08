@@ -178,14 +178,13 @@ def run():
                 print("This debugging session is already being recorded\n")
             else:
                 print("This debugging session is now being recorded\n")
+                userActions = []
                 shouldRecord = True
         elif userFlag == "sr" or userFlag == "stop_record":
             if not shouldRecord:
                 print("There is no debugging session being recorded")
             else:
                 print("This debugging session has stopped\n")
-                saveRecords(userActions)
-                userActions = []
                 shouldRecord = False
 
         print(browser.getCurrentNodeInfo())
