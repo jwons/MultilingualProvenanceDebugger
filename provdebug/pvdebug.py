@@ -191,10 +191,8 @@ def run():
                 print("There are no debugging traces to annotate")
             else:
                 print("Annotate the following:")
-                print("--------------------------------------------------\n")
                 latestRecord = userActions[-1]
-                print(latestRecord._programInfo)
-                print("--------------------------------------------------\n")
+                latestRecord.printProgramFrame()
                 annotation = input("Annotation: ")
                 latestRecord.setAnnotation(annotation)
                 print("Your annotation has been recorded. Resuming trace...")

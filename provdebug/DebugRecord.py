@@ -11,6 +11,14 @@ class DebugRecord:
         print(self._programInfo)
         if self._userAnnotation is not None:
             print(f"Annotation: {self._userAnnotation}")
+    
+    def printProgramFrame(self):
+        program_lines = self._programInfo.splitlines()
+        max_line_length = max([len(line) for line in program_lines])
+        frame = "=" * max_line_length
+        print(frame)
+        print(self._programInfo)
+        print(frame)
 
     def setAnnotation(self, annotation):
         self._userAnnotation = annotation
