@@ -43,8 +43,21 @@ def run():
             - l or lineage [variables]: prints the lineage of each space-separated variable passed to it 
             - p or print [variables]: prints the values of each space-separated variable passed to it
             - so or search: searches a script's error message on Stack Overflow
+            - r or record: begins recording the user's sequence of steps and associated program information as a trace
+            - sr or stop_record: stops the debugging recording
+            - a or annotate: allows the user to write and add an annotation to the most recent debugging step recorded
             - q or quit: quit the debugger
         ''')
+
+    replayerHelpText = textwrap.dedent('''\
+        Once the interface has started, type help for more information.
+
+        Otherwise, the interactive controls are as follows:
+            - n or next: step forward in trace
+            - b or back: step backward in trace
+            - q or quit: quit the replayer
+        ''')
+        
     parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
     formatter_class=RawDescriptionHelpFormatter,
     epilog=helpText)
@@ -65,19 +78,50 @@ def run():
 
     parser.add_argument("-r", "--replay", dest="file", required=False,
                         help="Prov.Replay file to analyze")
-    
-    # TODO: execute 2 different paths depending on what we run the debugger with
-    # If args contains the string .replay 
 
     #TO DEBUG
     #args = parser.parse_args(rest)
     
     args = parser.parse_args()
+
     provdb_command = sys.argv[1]
-    print(args.file)
-    if provdb_command == "-r":
-        prov.Replayer(args.file)
-        # TODO: execute path in ProvReplay
+    if provdb_command == "-r" or provdb_command == "--replay":
+        replayer = prov.Replayer(args.file)
+        print("🥺 Welcome 🥺")
+        replayRecords = replayer.getDebugRecords()
+        currNodeIndex = 0
+        if not replayRecords:
+            print("This replay file is empty.")
+            return
+        replayRecords[currNodeIndex].prettyPrint()
+        while True:
+            userInput = input("> ")
+            userChoices = userInput.split(" ")
+            userFlag = userChoices[0]
+            if userFlag == "h" or userFlag == "help":
+                print(replayerHelpText)
+                continue
+            elif userFlag == "n" or userFlag == "next":
+                if currNodeIndex + 1 < len(replayRecords):
+                    print(f"Step {currNodeIndex + 1}:")
+                    currNodeIndex += 1
+                    replayRecords[currNodeIndex].prettyPrint()
+                else:
+                    print("You are at the end of the trace.")
+                    replayRecords[currNodeIndex].prettyPrint()
+                continue
+            elif userFlag == "b" or userFlag == "back":
+                if currNodeIndex - 1 >= 0:
+                    print(f"Step {currNodeIndex + 1}:")
+                    currNodeIndex -= 1
+                    replayRecords[currNodeIndex].prettyPrint()
+                else:
+                    print("You are at the beginning of the trace.")
+                    replayRecords[currNodeIndex].prettyPrint()
+                continue
+            elif userFlag == "q" or userFlag == "quit":
+                break
+        return
 
     # record of user actions
     userActions = []
@@ -100,7 +144,7 @@ def run():
 
         userFlag = userChoices[0]
 
-        if(userFlag == "help"):
+        if(userFlag == "h" or userFlag == "help"):
             print(helpText)
             continue
         elif(userFlag == "n" or userFlag == "next"):

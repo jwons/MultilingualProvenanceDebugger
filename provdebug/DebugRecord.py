@@ -6,8 +6,8 @@ class DebugRecord:
         self._userAnnotation = userAnnotation
 
     def prettyPrint(self):
-        print(f"Developer action: {self._userChoice}")
-        print("Program info:\n")
+        print(f"Debug action: {self._userChoice}")
+        print("Program state:\n")
         print(self._programInfo)
         if self._userAnnotation is not None:
             print(f"Annotation: {self._userAnnotation}")

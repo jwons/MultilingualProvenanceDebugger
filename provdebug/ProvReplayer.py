@@ -7,5 +7,7 @@ class Replayer:
         f = open(filename, "r")
         raw_file_content = f.read()
         file_content_json = json.loads(raw_file_content)
-        debug_records = [DebugRecord.fromDict(d) for d in file_content_json]
-        pass
+        self._debug_records = [DebugRecord.fromDict(d) for d in file_content_json]
+    
+    def getDebugRecords(self):
+        return self._debug_records
