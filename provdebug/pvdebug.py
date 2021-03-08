@@ -173,29 +173,31 @@ def run():
             break
         elif userFlag == "r" or userFlag == "record":
             if shouldRecord:
-                print("This debugging session is already being recorded\n")
+                print("This debugging session is already being recorded.")
             else:
-                print("This debugging session is now being recorded\n")
+                print("This debugging session is now being recorded.")
                 userActions = []
                 shouldRecord = True
         elif userFlag == "sr" or userFlag == "stop_record":
             if not shouldRecord:
-                print("There is no debugging session being recorded")
+                print("There is no debugging session being recorded.")
             else:
-                print("This debugging session recording has stopped\n")
+                print("This debugging session recording has stopped.")
                 shouldRecord = False
         elif userFlag == "a" or userFlag == "annotate":
             if not shouldRecord:
                 print("You must start a recorded debugging session in order to annotate.")
+            elif not userActions:
+                print("There are no debugging traces to annotate")
             else:
-                print("Annotate the following:\n")
+                print("Annotate the following:")
                 print("--------------------------------------------------\n")
                 latestRecord = userActions[-1]
-                print(latestRecord.programInfo)
+                print(latestRecord._programInfo)
                 print("--------------------------------------------------\n")
                 annotation = input("Annotation: ")
                 latestRecord.setAnnotation(annotation)
-                print("Your annotation has been recorded. Resuming trace....")
+                print("Your annotation has been recorded. Resuming trace...")
 
 
         print(browser.getCurrentNodeInfo())
