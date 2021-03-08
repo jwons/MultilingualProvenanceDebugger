@@ -16,7 +16,7 @@ shouldRecord = False
 
 def recordUserActions(choice, records, info):
     if shouldRecord:
-        record = DebugRecord(choice, info)
+        record = DebugRecord(choice, info, None)
         records.append(record)
 
 def saveRecords(records):
@@ -101,7 +101,6 @@ def run():
         userFlag = userChoices[0]
 
         if(userFlag == "help"):
-            recordUserChoice(userFlag, userActions)
             print(helpText)
             continue
         elif(userFlag == "n" or userFlag == "next"):
@@ -109,24 +108,23 @@ def run():
             browser.nextNode()
         elif(userFlag == "b" or userFlag == "back"):
             recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
-            
             browser.previousNode()
         elif(userFlag == "s" or userFlag == "step"):
-            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
             browser.stepIn()
         elif(userFlag == "o" or userFlag == "out"):
-            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
             browser.stepOut()
         elif(userFlag == "v" or userFlag == "vars"):
-            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
             print(browser.getVarNamesFromCurrentLocation())
             continue
         elif(userFlag == "i" or userFlag == "info"):
-            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
             print(browser.getCurrentNodeInfo())
             continue
         elif(userFlag == "p" or userFlag == "print"):
-            recordUserActions(userFlag, userActions,  browser.getCurrentNodeInfo())
+            recordUserActions(userFlag, userActions, browser.getCurrentNodeInfo())
             vars = browser.getVarsFromCurrentLocation()
             varNames = userChoices[1:len(userChoices)]
             if(len(varNames) == 0):
@@ -184,8 +182,21 @@ def run():
             if not shouldRecord:
                 print("There is no debugging session being recorded")
             else:
-                print("This debugging session has stopped\n")
+                print("This debugging session recording has stopped\n")
                 shouldRecord = False
+        elif userFlag == "a" or userFlag == "annotate":
+            if not shouldRecord:
+                print("You must start a recorded debugging session in order to annotate.")
+            else:
+                print("Annotate the following:\n")
+                print("--------------------------------------------------\n")
+                latestRecord = userActions[-1]
+                print(latestRecord.programInfo)
+                print("--------------------------------------------------\n")
+                annotation = input("Annotation: ")
+                latestRecord.setAnnotation(annotation)
+                print("Your annotation has been recorded. Resuming trace....")
+
 
         print(browser.getCurrentNodeInfo())
 
