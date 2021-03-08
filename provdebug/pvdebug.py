@@ -83,6 +83,7 @@ def run():
     #args = parser.parse_args(rest)
     
     args = parser.parse_args()
+
     provdb_command = sys.argv[1]
     if provdb_command == "-r":
         replayer = prov.Replayer(args.file)
@@ -120,7 +121,7 @@ def run():
                 continue
             elif userFlag == "q" or userFlag == "quit":
                 break
-    return
+        return
 
     # record of user actions
     userActions = []
