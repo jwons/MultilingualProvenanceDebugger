@@ -85,7 +85,7 @@ def run():
     args = parser.parse_args()
 
     provdb_command = sys.argv[1]
-    if provdb_command == "-r":
+    if provdb_command == "-r" or provdb_command == "--replay":
         replayer = prov.Replayer(args.file)
         print("🥺 Welcome 🥺")
         replayRecords = replayer.getDebugRecords()
