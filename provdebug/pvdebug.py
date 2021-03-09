@@ -82,11 +82,12 @@ def run():
         replayer = prov.Replayer(args.file)
         print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information")
         debugTrace = replayer.getDebugTrace()
+        frame_length = debugTrace.max_line_length()
         if debugTrace.is_empty_trace():
             print("This replay file is empty.")
             return
         debugTrace.pretty_print_metadata()
-        debugTrace.current_record().prettyPrint()
+        debugTrace.current_record().prettyPrint(frame_length)
         while True:
             userInput = input("> ")
             userChoices = userInput.split(" ")
@@ -97,18 +98,18 @@ def run():
             elif userFlag == "n" or userFlag == "next":
                 record = debugTrace.next_record()
                 if record is not None:
-                    record.prettyPrint()
+                    record.prettyPrint(frame_length)
                 else:
                     print("You are at the end of the trace.")
-                    debugTrace.current_record().prettyPrint()
+                    debugTrace.current_record().prettyPrint(frame_length)
                 continue
             elif userFlag == "b" or userFlag == "back":
                 record = debugTrace.next_record()
                 if record is not None:
-                    record.prettyPrint()
+                    record.prettyPrint(frame_length)
                 else:
                     print("You are at the beginning of the trace.")
-                    debugTrace.current_record().prettyPrint()
+                    debugTrace.current_record().prettyPrint(frame_length)
                 continue
             elif userFlag == "q" or userFlag == "quit":
                 break

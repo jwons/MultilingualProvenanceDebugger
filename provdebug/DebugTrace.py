@@ -27,6 +27,14 @@ class DebugTrace:
             self._record_index += 1
             return self._debug_records[self._record_index]
         return None
+    
+    def max_line_length(self) -> int:
+        all_programs = [record._programInfo for record in self._debug_records]
+        all_program_lines = []
+        for program in all_programs:
+            all_program_lines.extend(program.splitlines())
+        line_lengths = [len(line) for line in all_program_lines]
+        return max(line_lengths)
 
     def is_empty_trace(self):
         return len(self._debug_records) == 0
