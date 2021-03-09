@@ -80,7 +80,7 @@ def run():
     provdb_command = sys.argv[1]
     if provdb_command == "-r" or provdb_command == "--replay":
         replayer = prov.Replayer(args.file)
-        print("🥺 Welcome 🥺")
+        print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information")
         debugTrace = replayer.getDebugTrace()
         if debugTrace.is_empty_trace():
             print("This replay file is empty.")
