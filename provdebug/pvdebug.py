@@ -213,6 +213,7 @@ def run():
                 print("This debugging session is already being recorded.")
             else:
                 print("This debugging session is now being recorded.")
+                # If the user has any previous recording not yet saved from exiting the debugger, then it will be overwritten.
                 userActions = []
                 shouldRecord = True
         elif userFlag == "sr" or userFlag == "stop_record":
