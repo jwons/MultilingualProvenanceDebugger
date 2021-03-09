@@ -5,9 +5,11 @@ class DebugRecord:
         self._programInfo = programInfo
         self._userAnnotation = userAnnotation
 
-    def prettyPrint(self):
+    def prettyPrint(self, frameLength):
+        print("=" * frameLength)
         print(f"Debug action: {self._userChoice}")
-        print("Program state:\n")
+        print("Program state:")
+        print("-" * frameLength)
         print(self._programInfo)
         if self._userAnnotation is not None:
             print(f"Annotation: {self._userAnnotation}")
