@@ -20,14 +20,6 @@ def recordUserActions(choice, records, info):
         record = DebugRecord(choice, info, None)
         records.append(record)
 
-def saveRecords(records):
-    recordDicts = [record.writeDict() for record in records]
-    encodedRecords = json.dumps(recordDicts)
-    # TODO: think of better way to name files
-    f = open(f"./debugging-trace-{random.randint(0, 9)}.replay", "w")
-    f.write(encodedRecords)
-    f.close()
-
 def run():
     # Needed to treat shouldRecord as a global value, and not a local one
     global shouldRecord
@@ -88,7 +80,7 @@ def run():
     provdb_command = sys.argv[1]
     if provdb_command == "-r" or provdb_command == "--replay":
         replayer = prov.Replayer(args.file)
-        print("🥺 Welcome 🥺")
+        print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information")
         debugTrace = replayer.getDebugTrace()
         if debugTrace.is_empty_trace():
             print("This replay file is empty.")
@@ -178,7 +170,6 @@ def run():
             continue
         elif(userFlag == "l" or userFlag == "lineage"):
             if(len(userChoices) > 1):
-                # TODO: figure out a recording strategy here
                 dfs = browser.getVariableLineage(userChoices[1:])
 
                 if(dfs[0] == 1):
@@ -210,15 +201,19 @@ def run():
                 browser.debugger.openStackSearch(result, choice)
             continue
         elif(userFlag == "q" or userFlag == "quit"):
-            Serializer.save_records(userActions)
-            for record in userActions:
-                record.prettyPrint()
+            if userActions:
+                filename = input("Enter a name for the recorded debugging trace (.replay): ")
+                Serializer.save_records(userActions, filename)
+                for record in userActions:
+                    record.prettyPrint()
+                print(f"Your debugging trace has been saved in your current working directory as {filename}.replay")
             break
         elif userFlag == "r" or userFlag == "record":
             if shouldRecord:
                 print("This debugging session is already being recorded.")
             else:
                 print("This debugging session is now being recorded.")
+                # If the user has any previous recording not yet saved from exiting the debugger, then it will be overwritten.
                 userActions = []
                 shouldRecord = True
         elif userFlag == "sr" or userFlag == "stop_record":
