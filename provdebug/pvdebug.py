@@ -4,6 +4,7 @@ import textwrap
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from .DebugRecord import DebugRecord
+from .Serializer import Serializer
 import provdebug as prov
 import readline
 import json
@@ -88,12 +89,12 @@ def run():
     if provdb_command == "-r" or provdb_command == "--replay":
         replayer = prov.Replayer(args.file)
         print("🥺 Welcome 🥺")
-        replayRecords = replayer.getDebugRecords()
-        currNodeIndex = 0
-        if not replayRecords:
+        debugTrace = replayer.getDebugTrace()
+        if debugTrace.is_empty_trace():
             print("This replay file is empty.")
             return
-        replayRecords[currNodeIndex].prettyPrint()
+        debugTrace.pretty_print_metadata()
+        debugTrace.current_record().prettyPrint()
         while True:
             userInput = input("> ")
             userChoices = userInput.split(" ")
@@ -102,22 +103,20 @@ def run():
                 print(replayerHelpText)
                 continue
             elif userFlag == "n" or userFlag == "next":
-                if currNodeIndex + 1 < len(replayRecords):
-                    print(f"Step {currNodeIndex + 1}:")
-                    currNodeIndex += 1
-                    replayRecords[currNodeIndex].prettyPrint()
+                record = debugTrace.next_record()
+                if record is not None:
+                    record.prettyPrint()
                 else:
                     print("You are at the end of the trace.")
-                    replayRecords[currNodeIndex].prettyPrint()
+                    debugTrace.current_record().prettyPrint()
                 continue
             elif userFlag == "b" or userFlag == "back":
-                if currNodeIndex - 1 >= 0:
-                    print(f"Step {currNodeIndex + 1}:")
-                    currNodeIndex -= 1
-                    replayRecords[currNodeIndex].prettyPrint()
+                record = debugTrace.next_record()
+                if record is not None:
+                    record.prettyPrint()
                 else:
                     print("You are at the beginning of the trace.")
-                    replayRecords[currNodeIndex].prettyPrint()
+                    debugTrace.current_record().prettyPrint()
                 continue
             elif userFlag == "q" or userFlag == "quit":
                 break
@@ -211,7 +210,7 @@ def run():
                 browser.debugger.openStackSearch(result, choice)
             continue
         elif(userFlag == "q" or userFlag == "quit"):
-            saveRecords(userActions)
+            Serializer.save_records(userActions)
             for record in userActions:
                 record.prettyPrint()
             break
