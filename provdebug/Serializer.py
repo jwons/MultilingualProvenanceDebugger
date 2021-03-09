@@ -7,7 +7,7 @@ from typing import List, Dict
 class Serializer:
 
     @staticmethod
-    def save_records(records: List[DebugRecord], filename):
+    def save_records(records: List[DebugRecord], filename: str):
         record_dicts = [r.writeDict() for r in records]
         metadata = Serializer.platform_metadata()
         replay_dict = {} 
