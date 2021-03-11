@@ -79,10 +79,10 @@ def run():
 
     provdb_command = sys.argv[1]
     if provdb_command == "-r" or provdb_command == "--replay":
-        print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information")
         if not args.file.endswith(".replay"):
             print("The following file extension for the replayer is required: .replay")
             return
+        print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information")
         replayer = prov.Replayer(args.file)
         debugTrace = replayer.getDebugTrace()
         frame_length = debugTrace.max_line_length()
