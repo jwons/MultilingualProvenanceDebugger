@@ -107,7 +107,7 @@ def run():
                     debugTrace.current_record().prettyPrint(frame_length)
                 continue
             elif userFlag == "b" or userFlag == "back":
-                record = debugTrace.next_record()
+                record = debugTrace.prev_record()
                 if record is not None:
                     record.prettyPrint(frame_length)
                 else:
