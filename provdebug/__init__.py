@@ -5,4 +5,5 @@ from .ProvBrowser import Browser
 from .DebugRecord import DebugRecord
 from .DebugTrace import DebugTrace
 from .Serializer import Serializer
+from .MarkdownFmt import MarkdownFmt
 from .ProvReplayer import Replayer
