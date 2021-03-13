@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from .DebugRecord import DebugRecord
 from .Serializer import Serializer
+from .MarkdownFmt import MarkdownFmt
 import provdebug as prov
 import readline
 import json
@@ -48,6 +49,7 @@ def run():
         Otherwise, the interactive controls are as follows:
             - n or next: step forward in trace
             - b or back: step backward in trace
+            - i or issue: print a prettified version of the entire trace as markdown-formatted output
             - q or quit: quit the replayer
         ''')
         
@@ -113,6 +115,13 @@ def run():
                 else:
                     print("You are at the beginning of the trace.")
                     debugTrace.current_record().prettyPrint(frame_length)
+                continue
+            elif userFlag == "i" or userFlag == "issue":
+                fmt = MarkdownFmt()
+                metadata = fmt.metadata_str(debugTrace._debug_metadata)
+                records = fmt.trace_str(debugTrace)
+                print(metadata)
+                print(records)
                 continue
             elif userFlag == "q" or userFlag == "quit":
                 break
@@ -208,8 +217,6 @@ def run():
             if userActions:
                 filename = input("Enter a name for the recorded debugging trace (.replay): ")
                 Serializer.save_records(userActions, filename)
-                for record in userActions:
-                    record.prettyPrint()
                 print(f"Your debugging trace has been saved in your current working directory as {filename}.replay")
             break
         elif userFlag == "r" or userFlag == "record":
