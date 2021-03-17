@@ -117,4 +117,4 @@ dmypy.json
 .Rhistory
 
 # testing
-/test
+/test/.DS_Store
