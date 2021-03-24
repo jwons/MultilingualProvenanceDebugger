@@ -56,7 +56,6 @@ def run():
     parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
     formatter_class=RawDescriptionHelpFormatter,
     epilog=helpText)
-    #Uncomment the following to debug
     '''
     #TO DEBUG
     parser.add_argument('--interactive', action='store_true', default=True)
@@ -125,6 +124,8 @@ def run():
                 continue
             elif userFlag == "q" or userFlag == "quit":
                 break
+            else:
+                print(f"'{userFlag}' is an unrecognized command.")
         return
 
     # record of user actions
@@ -242,9 +243,12 @@ def run():
                 print("Annotate the following:")
                 latestRecord = userActions[-1]
                 latestRecord.printProgramFrame()
+                print("Press ENTER to save. Save without an annotation to resume debugging.")
                 annotation = input("Annotation: ")
                 latestRecord.setAnnotation(annotation)
                 print("Your annotation has been recorded. Resuming trace...")
+        else:
+            print(f"'{userFlag}' is an unrecognized command.")
 
 
         print(browser.getCurrentNodeInfo())
