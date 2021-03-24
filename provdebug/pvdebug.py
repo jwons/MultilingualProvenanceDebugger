@@ -242,9 +242,12 @@ def run():
                 print("Annotate the following:")
                 latestRecord = userActions[-1]
                 latestRecord.printProgramFrame()
+                print("Press ENTER to save. Save without an annotation to resume debugging.")
                 annotation = input("Annotation: ")
                 latestRecord.setAnnotation(annotation)
                 print("Your annotation has been recorded. Resuming trace...")
+        else:
+            print(f"\'{userFlag}\' is an unrecognized command.")
 
 
         print(browser.getCurrentNodeInfo())
