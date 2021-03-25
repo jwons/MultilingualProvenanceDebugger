@@ -9,9 +9,6 @@ from .ProvExplorer import Explorer
 
 class Browser:
 
-    
-    # TODO: enable support for reading different types of files (e.g. .replay)
-    
     # This constructor takes a prov.json filename as an argument 
     # to initialize the debugger object which will parse the json
     # using the Parser object

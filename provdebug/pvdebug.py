@@ -6,6 +6,8 @@ from argparse import RawDescriptionHelpFormatter
 from .DebugRecord import DebugRecord
 from .Serializer import Serializer
 from .MarkdownFmt import MarkdownFmt
+from .ProvParser import Parser
+from .ProvGrapher import Grapher
 import provdebug as prov
 import readline
 import json
@@ -53,13 +55,13 @@ def run():
             - q or quit: quit the replayer
         ''')
         
-    parser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
+    argParser = ArgumentParser(description="provdb starts a provenance-based time traveling debugging interface.",
     formatter_class=RawDescriptionHelpFormatter,
     epilog=helpText)
     '''
     #TO DEBUG
-    parser.add_argument('--interactive', action='store_true', default=True)
-    (args, rest) = parser.parse_known_args()
+    argParser.add_argument('--interactive', action='store_true', default=True)
+    (args, rest) = argParser.parse_known_args()
     if args.interactive:
         try: readline.read_history_file()
         except: pass
@@ -67,18 +69,36 @@ def run():
         try: readline.write_history_file()
         except: pass
     '''
-    parser.add_argument("-f", "--file", dest="file", required=False,
+    argParser.add_argument("-f", "--file", dest="file", required=False,
                         help="Prov.Json file to analyze")
 
-    parser.add_argument("-r", "--replay", dest="file", required=False,
+    argParser.add_argument("-r", "--replay", dest="file", required=False,
                         help="Prov.Replay file to analyze")
+
+    argParser.add_argument("-d", "--diff", nargs='+', required=False,
+                        help="Prov.Json files to compare")
 
     #TO DEBUG
     #args = parser.parse_args(rest)
-    
-    args = parser.parse_args()
+
+    args = argParser.parse_args()
 
     provdb_command = sys.argv[1]
+    if provdb_command == "-d" or provdb_command == "-diff":
+        provided_files = args.diff
+        if not all(name.endswith(".json") for name in provided_files):
+            print("The following file extension for diff is required: .json")
+            return
+        fst_parsed_file = Parser(provided_files[0])
+        snd_parsed_file = Parser(provided_files[1])
+        fst_graph = Grapher(fst_parsed_file)
+        snd_graph = Grapher(snd_parsed_file)
+        if fst_graph.is_similar(snd_graph):
+            # TODO: deeper analysis
+        else:
+            print("The provided provenance data is too dissimilar, manual inspection is encouraged.")
+        return
+    
     if provdb_command == "-r" or provdb_command == "--replay":
         if not args.file.endswith(".replay"):
             print("The following file extension for the replayer is required: .replay")

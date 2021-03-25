@@ -58,3 +58,12 @@ class Grapher:
             lineage.append(self._nodes[node])
 
         return(lineage)
+
+    # This function checks whether two graphs could be isomorphic
+    def is_similar(self, other_graph: 'Grapher') -> bool:
+        other_graph_nx = other_graph._graph
+        is_isomorphic = nx.is_isomorphic(self._graph, other_graph_nx)
+        could_be_isomorphic = nx.could_be_isomorphic(
+            self._graph.to_undirected(), other_graph_nx.to_undirected()
+            )
+        return is_isomorphic or could_be_isomorphic
