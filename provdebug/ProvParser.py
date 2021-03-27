@@ -15,6 +15,9 @@ class Parser:
         prov = ""
         self._provData = {}
         self._provElements = {}
+        # This contains pairs from the provenance node, e.g. p1, to
+        # its value (R code)
+        self._provMapping = []
         
         # before the json can be converted into a Pythonic structure
         # it has to be 'cleaned.' prefixes and comments are removed
@@ -34,8 +37,6 @@ class Parser:
         prov = prov.replace("rdt:", "")
         prov = prov.replace("prov:", "")
         prov = json.loads(prov)
-
-        
 
         # Unlist the nested dictionary by one level. This 
         # way we have a 'master list' of provenance nodes and edges
@@ -62,6 +63,11 @@ class Parser:
         # Add the scripts sourced 
         d = dict((k, self._provData["environment"][k]) for k in ["sourcedScripts", "sourcedScriptTimeStamps"])
         self._provElements["scripts"] = pd.DataFrame(data = d, index = range(0, len(d["sourcedScripts"])))
+
+        # Get all the keys from the JSON that start with "p" (for procedure)
+        # and store a tuple from it to its R source code
+        self._provMapping = [(k, v["name"]) for k, v in self._provData.items() if k.startswith('p') and len(k) == 2]
+        print(self._provMapping)
 
     # To process nodes/edges from the master list the same process can be used
     # for most of them. This function handles converting dicts to the necessary data frame.
