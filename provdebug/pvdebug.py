@@ -8,6 +8,8 @@ from .Serializer import Serializer
 from .MarkdownFmt import MarkdownFmt
 from .ProvParser import Parser
 from .ProvGrapher import Grapher
+from .ProvDiffer import ProvDiffer
+import networkx as nx
 import provdebug as prov
 import readline
 import json
@@ -86,6 +88,7 @@ def run():
     provdb_command = sys.argv[1]
     if provdb_command == "-d" or provdb_command == "-diff":
         provided_files = args.diff
+        print(provided_files)
         if not all(name.endswith(".json") for name in provided_files):
             print("The following file extension for diff is required: .json")
             return
@@ -94,7 +97,14 @@ def run():
         fst_graph = Grapher(fst_parsed_file)
         snd_graph = Grapher(snd_parsed_file)
         if fst_graph.is_similar(snd_graph):
-            # TODO: deeper analysis
+            print(nx.info(fst_graph._graph))
+            print(nx.info(snd_graph._graph))
+            diff = ProvDiffer(fst_graph, snd_graph)
+            try:
+                print(diff.difference())
+            except Exception as err:
+                print(err)
+                print("The provided programs are exactly the same.")
         else:
             print("The provided provenance data is too dissimilar, manual inspection is encouraged.")
         return

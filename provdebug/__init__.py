@@ -7,3 +7,4 @@ from .DebugTrace import DebugTrace
 from .Serializer import Serializer
 from .MarkdownFmt import MarkdownFmt
 from .ProvReplayer import Replayer
+from .ProvDiffer import ProvDiffer
