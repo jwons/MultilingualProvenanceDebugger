@@ -67,7 +67,6 @@ class Parser:
         # Get all the keys from the JSON that start with "p" (for procedure)
         # and store a tuple from it to its R source code
         self._provMapping = [(k, v["name"]) for k, v in self._provData.items() if k.startswith('p') and len(k) == 2]
-        print(self._provMapping)
 
     # To process nodes/edges from the master list the same process can be used
     # for most of them. This function handles converting dicts to the necessary data frame.
