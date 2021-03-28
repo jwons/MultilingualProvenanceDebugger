@@ -8,7 +8,6 @@ from .Serializer import Serializer
 from .MarkdownFmt import MarkdownFmt
 from .ProvParser import Parser
 from .ProvGrapher import Grapher
-from .ProvDiffer import ProvDiffer
 from .ProvSlice import ProvSlice
 import networkx as nx
 import provdebug as prov
@@ -101,9 +100,13 @@ def run():
         similarity = fst_prov_slice.compute_similarity(snd_prov_slice)
         if similarity == 1.0:
             print("The provided provenance data is identical.")
-        elif similarity>= similarity_threshold:
+        elif similarity >= similarity_threshold:
             print(f"RATIO: {similarity}, SIMILAR ENOUGH TO ANALYZE")
             divergent_nodes = fst_prov_slice.divergent_nodes(snd_prov_slice)
+            for node in divergent_nodes[0]:
+                node.pretty_print()
+            for node in divergent_nodes[1]:
+                node.pretty_print()
             pass
         else:   
             print(f"RATIO: {similarity}, The provided provenance data is too dissimilar, manual inspection is encouraged.")
