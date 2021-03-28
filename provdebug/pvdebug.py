@@ -93,6 +93,7 @@ def run():
         if not all(name.endswith(".json") for name in provided_files):
             print("The following file extension for diff is required: .json")
             return
+        print("Welcome to the Multilingual Provenance Debugger in Diff Mode, type help for more information.")
         fst_parsed_file = Parser(provided_files[0])
         snd_parsed_file = Parser(provided_files[1])
         fst_prov_slice = ProvSlice(fst_parsed_file._prov_nodes)
@@ -101,22 +102,25 @@ def run():
         if similarity == 1.0:
             print("The provided provenance data is identical.")
         elif similarity >= similarity_threshold:
-            print(f"RATIO: {similarity}, SIMILAR ENOUGH TO ANALYZE")
             divergent_nodes = fst_prov_slice.divergent_nodes(snd_prov_slice)
-            for node in divergent_nodes[0]:
+            nodes_not_in_fst = divergent_nodes[0]
+            nodes_not_in_snd = divergent_nodes[1]
+            print(f"Nodes not in: {args.diff[0]}")
+            for node in nodes_not_in_fst:
                 node.pretty_print()
-            for node in divergent_nodes[1]:
+            print("=" * 69)
+            print(f"Nodes not in: {args.diff[1]}")
+            for node in nodes_not_in_snd:
                 node.pretty_print()
-            pass
-        else:   
-            print(f"RATIO: {similarity}, The provided provenance data is too dissimilar, manual inspection is encouraged.")
+        else:
+            print("The provided provenance data is too dissimilar, manual inspection is encouraged.")
         return
     
     if provdb_command == "-r" or provdb_command == "--replay":
         if not args.file.endswith(".replay"):
             print("The following file extension for the replayer is required: .replay")
             return
-        print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information")
+        print("Welcome to the Multilingual Provenance Debugger in Replayer Mode, type help for more information.")
         replayer = prov.Replayer(args.file)
         debugTrace = replayer.getDebugTrace()
         frame_length = debugTrace.max_line_length()
@@ -166,7 +170,7 @@ def run():
     
     browser = prov.Browser(args.file)
     
-    print("Welcome to the Multilingual Provenance Debugger, type help for more information")
+    print("Welcome to the Multilingual Provenance Debugger, type help for more information.")
     browser.stepIn()
     print(browser.getCurrentNodeInfo())
     

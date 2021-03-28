@@ -12,7 +12,9 @@ class ProvNode:
         self.end_line = end_line
 
     def pretty_print(self):
-        printed_node = "\n".join([f"Name: {self.name}", f"Content: {self.content}", f"Provenance Type: {self.node_type}"])
+        printed_node = "\n".join([f"Name: {self.name}", f"Content:\n{self.content}", 
+            f"Provenance Type: {self.node_type}", f"Start-End: {self.start_line}-{self.end_line}"
+        ])
         print(printed_node)
 
 class ProvSlice:
