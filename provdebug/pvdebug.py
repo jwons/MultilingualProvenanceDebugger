@@ -9,7 +9,7 @@ from .MarkdownFmt import MarkdownFmt
 from .ProvParser import Parser
 from .ProvGrapher import Grapher
 from .ProvDiffer import ProvDiffer
-from .ProvPair import ProvPair
+from .ProvSlice import ProvSlice
 import networkx as nx
 import provdebug as prov
 import readline
@@ -21,7 +21,7 @@ import sys
 # means we'd have to pass it around everywhere.
 shouldRecord = False
 
-similarity_threshold = 0.8
+similarity_threshold = 0.60
 
 def recordUserActions(choice, records, info):
     if shouldRecord:
@@ -96,19 +96,17 @@ def run():
             return
         fst_parsed_file = Parser(provided_files[0])
         snd_parsed_file = Parser(provided_files[1])
-        fst_prov = ProvPair(fst_parsed_file._provMapping)
-        snd_prov = ProvPair(snd_parsed_file._provMapping)
-        if fst_prov.compute_similarity(snd_prov) >= similarity_threshold:
-            # TODO: think of another approach
-            # diff = ProvDiffer(fst_graph, snd_graph)
-            # try:
-            #     print("Comuputing diff")
-            #     print(diff.difference())
-            # except Exception as err:
-            #     print(err)
-            #     print("The provided programs are exactly the same.")
-        else:
-            print("The provided provenance data is too dissimilar, manual inspection is encouraged.")
+        fst_prov_slice = ProvSlice(fst_parsed_file._prov_nodes)
+        snd_prov_slice = ProvSlice(snd_parsed_file._prov_nodes)
+        similarity = fst_prov_slice.compute_similarity(snd_prov_slice)
+        if similarity == 1.0:
+            print("The provided provenance data is identical.")
+        elif similarity>= similarity_threshold:
+            print(f"RATIO: {similarity}, SIMILAR ENOUGH TO ANALYZE")
+            divergent_nodes = fst_prov_slice.divergent_nodes(snd_prov_slice)
+            pass
+        else:   
+            print(f"RATIO: {similarity}, The provided provenance data is too dissimilar, manual inspection is encouraged.")
         return
     
     if provdb_command == "-r" or provdb_command == "--replay":

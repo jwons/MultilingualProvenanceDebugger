@@ -1,7 +1,7 @@
 import json
 import re
 import pandas as pd
-
+from .ProvSlice import ProvNode
 class Parser:
 
     # holds the dictionary of provenance
@@ -66,7 +66,7 @@ class Parser:
 
         # Get all the keys from the JSON that start with "p" (for procedure)
         # and store a tuple from it to its R source code
-        self._provMapping = [(k, v["name"]) for k, v in self._provData.items() if k.startswith('p') and len(k) == 2]
+        self._prov_nodes = [self._to_prov_node(k, v) for k, v in self._provData.items() if k.startswith('p') and len(k) == 2]
 
     # To process nodes/edges from the master list the same process can be used
     # for most of them. This function handles converting dicts to the necessary data frame.
@@ -159,3 +159,13 @@ class Parser:
             dataNodes = dataNodes[dataNodes.index.isin(procData)]
 
         return(dataNodes[["name", "location", "timestamp"]])
+
+    def _to_prov_node(self, node_name: str, prov_json) -> ProvNode:
+        return ProvNode(
+            name = node_name,
+            content = prov_json["name"],
+            node_type = prov_json["type"],
+            start_line = prov_json["startLine"],
+            end_line = prov_json["endLine"],
+        )
+
