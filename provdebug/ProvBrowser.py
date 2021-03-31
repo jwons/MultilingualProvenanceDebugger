@@ -115,7 +115,6 @@ class Browser:
     # scripts, or other control structures. If it's called already at the end of the 
     # nodes, it will return 1 rather than 0 and keep the same node number. 
     def nextNode(self):
-
         if(self.currentNodeIndex + 1 < len(self._scopeStack[self._currentScope])):
             self.currentNodeIndex += 1
         elif(self.currentNodeIndex + 1 == len(self._scopeStack[self._currentScope]) and len(self.positionStack) > 0):
@@ -126,10 +125,9 @@ class Browser:
     # scripts, or other control structures. If it's called already at the start of the 
     # nodes, it will return 1 rather than 0 and keep the same node number.
     def previousNode(self):
-
         if(self.currentNodeIndex - 1 > -1):
             self.currentNodeIndex -= 1
-        elif(self.currentNodeIndex -1 == -1):
+        elif(self.currentNodeIndex -1 == -1 and self._currentScope > 1):
             self.stepOut()
     
     # This function lists all the variables that exist in the current point of execution
