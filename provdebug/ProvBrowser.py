@@ -117,7 +117,7 @@ class Browser:
     def nextNode(self):
         if(self.currentNodeIndex + 1 < len(self._scopeStack[self._currentScope])):
             self.currentNodeIndex += 1
-        elif(self.currentNodeIndex + 1 == len(self._scopeStack[self._currentScope]) and len(self.positionStack) > 0):
+        elif(self.currentNodeIndex + 1 == len(self._scopeStack[self._currentScope]) and len(self.positionStack) > 0 and self._currentScope > 1):
             self.stepOut()       
 
     # This function can be called to back up the simulated execution by a single 
