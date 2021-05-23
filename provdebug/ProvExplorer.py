@@ -1,3 +1,4 @@
+from numpy.lib.arraysetops import isin
 import pandas as pd
 import numpy as np
 import webbrowser
@@ -7,6 +8,8 @@ import sys
 import re
 from .ProvParser import Parser
 from .ProvGrapher import Grapher
+from pdb import set_trace as bp
+
 
 class Explorer:
 
@@ -531,13 +534,19 @@ class Explorer:
         return(procNode)
 
     # This function will provide the data node a proc node generated. 
-    # Requires a proc node label and returns a single dataframe row from data nodes
+    # Requires a proc node label and returns a dataframe of data nodes
+    # that are the nodes the procedure created
+    # Otherwise if the proc node created no datanodes will return None
     def getDataFromProcedure(self, proc_node):
         dataNodes = self.prov.getDataNodes()
         procToData = self.prov.getProcData()
-        dataNodeLabel = procToData.loc[procToData["activity"] == proc_node]["entity"].values[0]
-        dataNode = dataNodes.loc[dataNodes["label"] == dataNodeLabel]
-        return(dataNode)
+        dataNodeLabel = procToData.loc[procToData["activity"] == proc_node]["entity"].values
+        
+        if(len(dataNodeLabel) != 0):
+            dataNodeList = dataNodes.loc[dataNodes["label"].isin(dataNodeLabel)]
+        else:
+            dataNodeList = None
+        return(dataNodeList)
 
     # This function takes a variable name and returns that variables life cycles. 
     # Life cycles in this context are groups of instances of a single variable in 
@@ -574,11 +583,17 @@ class Explorer:
         # Each iteration will subset out the life cycles discovered, when there are no more
         # labels, that means all cycles have been found.
         while(len(varLabels) > 0):
-            # collect the forward lineage of all related procedure nodes form this particular data node
+            # collect the forward lineage of all related procedure nodes from this particular data node
             lineageProcs = self.getNodeLifeCycle(initialLabel, procNodes)
-
+            dataLineage = []
+            for node in lineageProcs:
+                dataRow = self.getDataFromProcedure(node)
+                if(dataRow is not None):
+                    dataLineage.append(dataRow["label"].to_numpy())
+            
             # Collect all the data nodes that were generated from proc nodes in this particular data node's forward lineage
-            dataLineage = np.concatenate([self.getDataFromProcedure(node)["label"].to_numpy() for node in lineageProcs])
+            #dataLineage = np.concatenate([self.getDataFromProcedure(node)["label"].to_numpy() for node in lineageProcs])
+            dataLineage = np.concatenate(dataLineage)
 
             # Mask is used to subset out the life cycle, and then remove life cycle by subsetting the negation of the mask
             cycle_mask = np.isin(varLabels, dataLineage)
