@@ -7,9 +7,11 @@ class Parser:
     # holds the dictionary of provenance
     _provData = {}
     
-    #Holds a dictionary of data frames where each data frame is an 
+    # Holds a dictionary of data frames where each data frame is an 
     # "element" of the provenance. e.g procedure nodes, data nodes, etc.
     _provElements = {}
+
+    _provEdges = None
 
     # Constructor takes a filepath to a provenance file and reads in 
     # the information into memory
@@ -62,6 +64,19 @@ class Parser:
         # Add the scripts sourced 
         d = dict((k, self._provData["environment"][k]) for k in ["sourcedScripts", "sourcedScriptTimeStamps"])
         self._provElements["scripts"] = pd.DataFrame(data = d, index = range(0, len(d["sourcedScripts"])))
+
+        procData = self.getProcData()
+        dataProc = self.getDataProc()
+        funcProc = self.getFuncProc()
+        funcLib = self.getFuncLib()
+
+        procData.rename(columns = {'activity':'source', 'entity':'target'}, inplace = True)
+        dataProc.rename(columns = {'entity':'source', 'activity':'target'}, inplace = True)
+        funcProc.rename(columns = {'entity':'source', 'activity':'target'}, inplace = True)
+        funcProc.rename(columns = {'collection':'source', 'entity':'target'}, inplace = True)
+
+        self._provEdges = pd.concat([procData, dataProc, funcProc, funcProc], axis=0)
+
 
     # To process nodes/edges from the master list the same process can be used
     # for most of them. This function handles converting dicts to the necessary data frame.
@@ -154,3 +169,13 @@ class Parser:
             dataNodes = dataNodes[dataNodes.index.isin(procData)]
 
         return(dataNodes[["name", "location", "timestamp"]])
+
+    def _getEdgeRelation(self, procID, from_column, to_column):
+        return(list(self._provEdges[self._provEdges[from_column] == procID][to_column].values))
+
+
+    def getParentIDs(self, childID):
+        return(self._getEdgeRelation(childID, "target", "source"))
+
+    def getChildIDs(self, childID):
+        return(self._getEdgeRelation(childID, "source", "target"))
