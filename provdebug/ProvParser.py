@@ -4,23 +4,24 @@ import pandas as pd
 
 class Parser:
 
-    # holds the dictionary of provenance
-    _provData = {}
-    
-    # Holds a dictionary of data frames where each data frame is an 
-    # "element" of the provenance. e.g procedure nodes, data nodes, etc.
-    _provElements = {}
-
-    _provEdges = None
-
     # Constructor takes a filepath to a provenance file and reads in 
     # the information into memory
     def __init__(self, inputProv, isFile = True):
         prov = ""
+        # holds the dictionary of provenance
+        self._provData = {}
+
+        # Holds a dictionary of data frames where each data frame is an 
+        # "element" of the provenance. e.g procedure nodes, data nodes, etc.
+        self._provElements = {}
+
+
+        self._provEdges = None
         
         # before the json can be converted into a Pythonic structure
         # it has to be 'cleaned.' prefixes and comments are removed
-        provLines = []
+        self.provLines = []
+
 
         if(isFile):
             with open(inputProv) as provJson:
