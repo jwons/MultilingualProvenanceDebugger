@@ -78,6 +78,23 @@ class Parser:
 
         self._provEdges = pd.concat([procData, dataProc, funcProc, funcProc], axis=0)
 
+        procNodes = self.getProcNodes()
+        row_index = 0
+        loop_nodes = []
+        for index, row in procNodes.iterrows():
+            if(row["type"] == "Start" and row["name"] == "for loop"):
+                if(procNodes.iloc[[row_index - 1]]["type"].values[0] == "Start"):
+                    previousNode = procNodes.iloc[[row_index - 1]]
+                    endNode = procNodes.loc[
+                        (procNodes["startLine"] == previousNode["startLine"].values[0]) &
+                        (procNodes["endLine"] == previousNode["endLine"].values[0]) & 
+                        (procNodes["startCol"] == previousNode["startCol"].values[0]) &
+                        (procNodes["endCol"] == previousNode["endCol"].values[0]) &
+                        (procNodes["type"] == "Finish")]
+                    loop_nodes.append((previousNode.index.values[0], endNode.index.values[0]))
+            row_index += 1
+        self.loop_nodes = loop_nodes
+
 
     # To process nodes/edges from the master list the same process can be used
     # for most of them. This function handles converting dicts to the necessary data frame.
@@ -180,3 +197,6 @@ class Parser:
 
     def getChildIDs(self, childID):
         return(self._getEdgeRelation(childID, "source", "target"))
+    
+    def getLoopNodes(self):
+        return(self.loop_nodes)
