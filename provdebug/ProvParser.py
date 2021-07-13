@@ -188,15 +188,21 @@ class Parser:
 
         return(dataNodes[["name", "location", "timestamp"]])
 
-    def _getEdgeRelation(self, procID, from_column, to_column):
-        return(list(self._provEdges[self._provEdges[from_column] == procID][to_column].values))
+    def _getEdgeRelation(self, procID, from_column, to_column, edgeType):
+        if(edgeType is None):
+            return(list(self._provEdges[self._provEdges[from_column] == procID][to_column].values))
+        else:
+            df = self._provEdges[self._provEdges[from_column] == procID][to_column]
+            regex = "^" + edgeType + "\d+$"
+            #return(df[pd.Series(df.index).str.contains(regex).values])
+            return(list(df[pd.Series(df.index).str.contains(regex, case=False).values].values))
 
 
-    def getParentIDs(self, childID):
-        return(self._getEdgeRelation(childID, "target", "source"))
+    def getParentIDs(self, childID, edgeType = None):
+        return(self._getEdgeRelation(childID, "target", "source", edgeType))
 
-    def getChildIDs(self, childID):
-        return(self._getEdgeRelation(childID, "source", "target"))
+    def getChildIDs(self, childID, edgeType = None):
+        return(self._getEdgeRelation(childID, "source", "target", edgeType))
     
     def getLoopNodes(self):
         return(self.loop_nodes)
