@@ -6,7 +6,7 @@ import provdebug as pvd
 class TestProvParser(unittest.TestCase):
 
     def setUp(self):
-        self.prov = pvd.Parser("provdebug/tests/test.json")
+        self.prov = pvd.Parser("test.json")
     
     def testConstruction(self):
         self.assertTrue(hasattr(self.prov, '_provElements'))
@@ -50,7 +50,7 @@ class TestProvParser(unittest.TestCase):
 class TestProvGrapher(unittest.TestCase):
 
     def setUp(self):
-        prov = pvd.Parser("provdebug/tests/test.json")
+        prov = pvd.Parser("test.json")
         self.graph = pvd.Grapher(prov)
     
     def testConstruction(self):
@@ -64,8 +64,8 @@ class TestProvGrapher(unittest.TestCase):
 class TestProvDebugger(unittest.TestCase):
 
     def setUp(self):
-        self.pvdebug = pvd.Explorer("provdebug/tests/test.json")
-    
+        self.pvdebug = pvd.Explorer("test.json")
+
     def testTypeCheckNoArgs(self):
         returnCode, returnValue = self.pvdebug.typeCheck()
         self.assertEqual(returnCode, 1)

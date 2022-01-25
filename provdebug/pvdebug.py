@@ -52,9 +52,10 @@ def run():
     browser.stepIn()
     print(browser.getCurrentNodeInfo())
 
+    try: readline.read_history_file()
+    except: pass
+
     while(True):
-        try: readline.read_history_file()
-        except: pass
         userInput = input(">")
         try: readline.write_history_file()
         except: pass

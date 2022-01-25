@@ -38,9 +38,7 @@ class Explorer:
 
         # Variable exist in the provenance information as 'Data'
         # or 'Snapshot' types from the data nodes.
-        posVars = self.prov.getDataNodes()
-        posVars = posVars[posVars.type.isin(["Data", "Snapshot"])]
-        posVars = list(set(posVars['name']))
+        posVars = self.getUniqueVarNames()
         
         posArgs = []
 
@@ -609,7 +607,13 @@ class Explorer:
         return(lifeCycles)
 
 
-    # This function takes a data node, finds the procedure node that generated it, and then uses that proc node to find a
+    # This function returns all unique variable names used in a script
+    def getUniqueVarNames(self):
+        posVars = self.prov.getDataNodes()
+        posVars = posVars[posVars.type.isin(["Data", "Snapshot"])]
+        return list(set(posVars['name']))
+
+        # This function takes a data node, finds the procedure node that generated it, and then uses that proc node to find a
     # forward lineage of the data node that was passed in as a label. Returns an np array of procedure nodes.
     def getNodeLifeCycle(self, initialLabel, procNodes):
 
