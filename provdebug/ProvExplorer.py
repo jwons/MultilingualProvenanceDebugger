@@ -610,13 +610,20 @@ class Explorer:
     # This function returns all unique variable names used in a script
     def getUniqueVarNames(self):
         posVars = self.prov.getDataNodes()
-        posVars = posVars[posVars.type.isin(["Data", "Snapshot"])]
-        return list(set(posVars['name']))
+        retVal = []
+        if("name" in posVars.columns):
+            posVars = posVars[posVars.type.isin(["Data", "Snapshot"])]
+            retVal = list(set(posVars['name']))
+        return retVal
 
         # This function takes a data node, finds the procedure node that generated it, and then uses that proc node to find a
     # forward lineage of the data node that was passed in as a label. Returns an np array of procedure nodes.
     def getNodeLifeCycle(self, initialLabel, procNodes):
 
         initialNode = self.getProcedureFromData(initialLabel)["label"].to_numpy()[0]
-        lineageProcs = [initialNode] + list(self._processLabel(initialLabel, procNodes, forward=True)["label"].to_numpy())
+        lineage_df = self._processLabel(initialLabel, procNodes, forward=True)
+        if("label" not in lineage_df.columns):
+            lineageProcs = [initialNode]
+        else:
+            lineageProcs = [initialNode] + list(self._processLabel(initialLabel, procNodes, forward=True)["label"].to_numpy())
         return(lineageProcs)

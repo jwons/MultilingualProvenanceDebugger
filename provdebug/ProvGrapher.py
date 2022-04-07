@@ -22,17 +22,21 @@ class Grapher:
         dataProc = prov.getDataProc().rename(columns={"entity": "from", "activity":"to"})
 
         edges = pd.concat([procData, dataProc], sort = True)
-        
-        # This creates an all zero dataframe of the corrrect proportions that
-        # will have the connections assinged as a "1" next 
-        df = pd.DataFrame(0, index = self._nodes, columns= self._nodes)
 
-        # Mark the connections using the value of 1
-        for edge in zip(edges["from"], edges["to"]):
-            df.loc[edge[1], edge[0]] = 1
+        # If there are no edges assign empty graph, otherwise convert df of edges to DiGraph
+        if not edges.empty:
+            # This creates an all zero dataframe of the correct proportions that
+            # will have the connections assigned as a "1" next
+            df = pd.DataFrame(0, index=self._nodes, columns=self._nodes)
 
-        # Create the graph save it to the class
-        self._graph = nx.from_numpy_matrix(df.values, create_using = nx.DiGraph())
+            # Mark the connections using the value of 1
+            for edge in zip(edges["from"], edges["to"]):
+                df.loc[edge[1], edge[0]] = 1
+
+            # Create the graph save it to the class
+            self._graph = nx.from_numpy_matrix(df.values, create_using=nx.DiGraph())
+        else:
+            self._graph = nx.DiGraph()
 
     # This function is used to generate a list of the nodes that a singular
     # node is connected to. The user can choose to search for connections forward
